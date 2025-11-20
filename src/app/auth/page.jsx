@@ -3,7 +3,7 @@ import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React, { useEffect } from "react";
 
-const App = () => {
+const Auth = () => {
   const router = useRouter();
 
   useEffect(() => {
@@ -17,4 +17,4 @@ const App = () => {
   );
 };
 
-export default App;
+export default Auth;

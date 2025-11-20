@@ -143,9 +143,9 @@ const Table = () => {
           <thead className="sticky top-0 z-10">
             <tr className="bg-[#E8E8FF] font-medium">
               <th className="px-8 py-5 text-left text-nowrap">Date</th>
-              <th className="px-8 py-5 text-left text-nowrap">Shift Time</th>
+              <th className="px-6 py-5 text-left text-nowrap">Shift Time</th>
               <th className="px-8 py-5 text-left text-nowrap">Type</th>
-              <th className="px-8 py-5 text-left text-nowrap">Reason</th>
+              <th className="px-6 py-5 text-left text-nowrap">Reason</th>
               <th className="px-8 py-5 text-left text-nowrap">Submitted</th>
               <th className="px-8 py-5 text-left text-nowrap">Status</th>
               <th className="px-8 py-5 text-center text-nowrap">Action</th>
@@ -154,19 +154,19 @@ const Table = () => {
           <tbody>
             {shifts.map((shift, index) => (
               <tr key={index} className="border-b border-[#D4D4D4]">
-                <td className="px-8 py-6">
+                <td className="px-8 py-5">
                   {shift.date}
                   {/* {utils.formatDateWithName(shift.date)} */}
                 </td>
-                <td className="px-8 py-6">{shift.time}</td>
-                <td className="px-8 py-6">{shift.type}</td>
-                <td className="px-8 py-6">{shift.reason}</td>
-                <td className="px-8 py-6">{shift.submitted}</td>
-                <td className={`px-8 py-6 ${getStatusColor(shift.status)}`}>
+                <td className="px-6 py-5">{shift.time}</td>
+                <td className="px-8 py-5">{shift.type}</td>
+                <td className="px-6 py-5">{shift.reason}</td>
+                <td className="px-8 py-5">{shift.submitted}</td>
+                <td className={`px-8 py-5 ${getStatusColor(shift.status)}`}>
                   {/* {utils.capitalize(shift.status)} */}
                   {shift.status}
                 </td>
-                <td className="px-8 py-6">
+                <td className="px-8 py-5">
                   <div
                     onClick={() => setShiftModal(true)}
                     className="flex justify-center items-center cursor-pointer"

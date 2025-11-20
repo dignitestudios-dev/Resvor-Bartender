@@ -9,7 +9,7 @@ import {
 import { Button } from "@/components/ui/button";
 import TimePickerField from "../global/TimePickerField";
 
-const RequestShiftSwapModal = ({ isOpen, onOpenChange }) => {
+const RequestShiftSwapModal = ({ isOpen, onOpenChange, setSuccessModal }) => {
   const [reason, setReason] = useState("");
 
   const [openField, setOpenField] = useState(null);
@@ -91,7 +91,10 @@ const RequestShiftSwapModal = ({ isOpen, onOpenChange }) => {
           <div className="w-full">
             <Button
               className={"w-full py-4 font-medium rounded-[12px]"}
-              onClick={() => onOpenChange(false)}
+              onClick={() => {
+                onOpenChange(false);
+                setSuccessModal(true);
+              }}
             >
               Submit Request
             </Button>

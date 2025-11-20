@@ -53,6 +53,7 @@ const Dashboard = () => {
       status: "Rejected",
     },
   ];
+
   return (
     <div>
       <div className="flex justify-between items-center gap-10">

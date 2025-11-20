@@ -2,20 +2,44 @@
 import React, { useState } from "react";
 
 const NotificationSection = () => {
-  const filteredTasks = [
+  const [selectTab, setSelectTab] = useState("all");
+  const [notifications, setNotifications] = useState([
     {
+      id: 1,
       title: "New Task Assigned",
       description:
         "Lorem ipsum dolor sit amet consectetur. In volutpat et mattis ut tristique viverra blandit.",
       createdAt: "12-03-2025",
+      read: false,
     },
-  ];
-  const [selectTab, setSelectTab] = useState("all");
+    {
+      id: 2,
+      title: "Shift Approved",
+      description:
+        "Your requested shift change has been approved by the manager.",
+      createdAt: "11-20-2025",
+      read: true,
+    },
+    {
+      id: 3,
+      title: "New Message from Manager",
+      description: "Please check the updated schedule for next week.",
+      createdAt: "11-18-2025",
+      read: false,
+    },
+  ]);
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSelect = (val) => {
     setSelectTab(val);
   };
+  // derive filtered tasks from notifications and selected tab
+  const filteredTasks = notifications.filter((n) => {
+    if (selectTab === "all") return true;
+    if (selectTab === "read") return n.read === true;
+    if (selectTab === "unread") return n.read === false;
+    return true;
+  });
   return (
     <div className="rounded-lg shadow-customShadow bg-white py-4  ">
       <div className="w-full border-b-2 border-gray-100 ">
@@ -104,6 +128,12 @@ const NotificationSection = () => {
                       <p className="text-[14px] text-[#717171] mb-2">
                         {item?.createdAt}
                       </p>
+                      {/* unread indicator */}
+                      {!item?.read ? (
+                        <span className="bg-primary rounded-full px-2 text-[14px] text-white">
+                          1
+                        </span>
+                      ) : null}
                       {/* {unReadLoadingId === item._id ? (
                         <p className="text-xs text-gray-500">Loading...</p>
                       ) : (

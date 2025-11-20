@@ -7,7 +7,7 @@ const inter = Inter({
 });
 
 export const metadata = {
-  title: "Resvor Bartender",
+  title: "Resvor - Bartender",
   description: "Resvor bartender dashboard",
   icons: {
     icon: "/public/logo.svg",
@@ -17,7 +17,9 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body className={`${inter.variable} antialiased bg-[#F4F4FF]`}>
+      <body
+        className={`${inter.className} antialiased bg-[#F4F4FF] overflow-x-hidden`}
+      >
         {children}
       </body>
     </html>

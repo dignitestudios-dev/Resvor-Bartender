@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 
-const RequestTimeOffModal = ({ isOpen, onOpenChange }) => {
+const RequestTimeOffModal = ({ isOpen, onOpenChange, setSuccessModal }) => {
   const [reason, setReason] = useState("");
 
   return (
@@ -66,7 +66,10 @@ const RequestTimeOffModal = ({ isOpen, onOpenChange }) => {
           <div className="w-full">
             <Button
               className={"w-full py-4 font-medium rounded-[12px]"}
-              onClick={() => onOpenChange(false)}
+              onClick={() => {
+                onOpenChange(false);
+                setSuccessModal(true);
+              }}
             >
               Submit Request
             </Button>

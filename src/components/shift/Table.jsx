@@ -5,11 +5,13 @@ import { IoIosArrowForward } from "react-icons/io";
 import UpcomingShiftModal from "./UpcomingShiftModal";
 import RequestShiftSwapModal from "./RequestShiftSwapModal";
 import RequestTimeOffModal from "./RequestTimeOffModal";
+import SuccessModal from "../global/SuccessModal";
 
 const Table = () => {
   const [shiftModal, setShiftModal] = useState(false);
   const [timeOffOpen, setTimeOffOpen] = useState(false);
   const [shiftSwapOpen, setShiftSwapOpen] = useState(false);
+  const [successModal, setSuccessModal] = useState(false);
 
   const shifts = [
     {
@@ -151,13 +153,13 @@ const Table = () => {
               <th className="px-8 py-5 text-left text-[#202224] text-nowrap">
                 Date
               </th>
-              <th className="px-8 py-5 text-left text-[#202224] text-nowrap">
+              <th className="px-6 py-5 text-left text-[#202224] text-nowrap">
                 Time
               </th>
               <th className="px-8 py-5 text-left text-[#202224] text-nowrap">
                 Role
               </th>
-              <th className="px-8 py-5 text-left text-[#202224] text-nowrap">
+              <th className="px-6 py-5 text-left text-[#202224] text-nowrap">
                 Event
               </th>
               <th className="px-8 py-5 text-left text-[#202224] text-nowrap">
@@ -172,19 +174,19 @@ const Table = () => {
           <tbody>
             {shifts.map((shift, index) => (
               <tr key={index} className="border-b border-[#D4D4D4]">
-                <td className="px-8 py-6">
+                <td className="px-8 py-5">
                   {shift.date}
                   {/* {utils.formatDateWithName(shift.date)} */}
                 </td>
-                <td className="px-8 py-6">{shift.time}</td>
-                <td className="px-8 py-6">{shift.type}</td>
-                <td className="px-8 py-6">{shift.reason}</td>
-                <td className="px-8 py-6">{shift.submitted}</td>
-                <td className={`px-8 py-6 ${getStatusColor(shift.status)}`}>
+                <td className="px-6 py-5">{shift.time}</td>
+                <td className="px-8 py-5">{shift.type}</td>
+                <td className="px-6 py-5">{shift.reason}</td>
+                <td className="px-8 py-5">{shift.submitted}</td>
+                <td className={`px-8 py-5 ${getStatusColor(shift.status)}`}>
                   {/* {utils.capitalize(shift.status)} */}
                   {shift.status}
                 </td>
-                <td className="px-8 py-6">
+                <td className="px-8 py-5">
                   <div
                     onClick={() => setShiftModal(true)}
                     className="flex justify-center items-center cursor-pointer"
@@ -210,12 +212,22 @@ const Table = () => {
           <RequestTimeOffModal
             isOpen={timeOffOpen}
             onOpenChange={(val) => setTimeOffOpen(val)}
+            setSuccessModal={setSuccessModal}
           />
         )}
         {shiftSwapOpen && (
           <RequestShiftSwapModal
             isOpen={shiftSwapOpen}
             onOpenChange={(val) => setShiftSwapOpen(val)}
+            setSuccessModal={setSuccessModal}
+          />
+        )}
+        {successModal && (
+          <SuccessModal
+            isOpen={successModal}
+            onOpenChange={(val) => setSuccessModal(val)}
+            title="Request Submitted"
+            content="Your request has been successfully submitted."
           />
         )}
       </div>

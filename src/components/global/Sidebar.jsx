@@ -4,6 +4,8 @@ import Link from "next/link";
 import React from "react";
 import Logo from "../icons/Logo";
 import { usePathname } from "next/navigation";
+import { Button } from "../ui/button";
+import { LogOut } from "lucide-react";
 
 const Sidebar = () => {
   const pathname = usePathname();
@@ -29,6 +31,16 @@ const Sidebar = () => {
           );
         })}
       </ul>
+      <div className="h-1/3 flex items-end">
+        <Button
+          className={
+            "bg-white px-3 py-2 text-primary rounded-[12px] text-[12px] hover:bg-slate-100 cursor-pointer"
+          }
+        >
+          <LogOut className="mr-2 h-4 w-4 " />
+          Logout
+        </Button>
+      </div>
     </nav>
   );
 };
