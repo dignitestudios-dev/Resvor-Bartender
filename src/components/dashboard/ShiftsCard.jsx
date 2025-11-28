@@ -20,16 +20,16 @@ const ShiftsCard = ({
       </div>
       <ul className="space-y-2 list-none">
         <li className="flex items-center gap-2 text-[#6E6E6E]">
-          <GoClockFill className="text-lg" />
+          <GoClockFill className="text-lg text-indigo-950" />
           <span>{time}</span>
         </li>
         <li className="flex items-center gap-2 text-[#6E6E6E]">
-          <IoLocation className="text-xl" />
+          <IoLocation className="text-xl text-indigo-950" />
           <span>{location}</span>
         </li>
 
         <li className="flex items-center gap-2 text-[#6E6E6E]">
-          <BiSolidBadgeDollar className="text-xl" />
+          <BiSolidBadgeDollar className="text-xl text-indigo-950" />
           <span>{eventType}</span>
         </li>
       </ul>

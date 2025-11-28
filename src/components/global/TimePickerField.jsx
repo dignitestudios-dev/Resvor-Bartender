@@ -36,7 +36,7 @@ const TimePickerField = ({
       {/* Dropdown */}
       {open && (
         <div
-          className={`absolute z-50 mt-2 shadow-lg p-2 bg-white w-[400px] ${position}`}
+          className={`absolute z-50 mt-2 shadow-lg p-2 rounded-2xl bg-white w-[400px] ${position}`}
         >
           <div className="mb-4 mt-4">
             <label className="block text-sm font-medium text-gray-700 mb-2">

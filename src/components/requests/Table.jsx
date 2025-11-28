@@ -148,7 +148,7 @@ const Table = () => {
               <th className="px-6 py-5 text-left text-nowrap">Reason</th>
               <th className="px-8 py-5 text-left text-nowrap">Submitted</th>
               <th className="px-8 py-5 text-left text-nowrap">Status</th>
-              <th className="px-8 py-5 text-center text-nowrap">Action</th>
+              {/* <th className="px-8 py-5 text-center text-nowrap">Action</th> */}
             </tr>
           </thead>
           <tbody>
@@ -166,14 +166,14 @@ const Table = () => {
                   {/* {utils.capitalize(shift.status)} */}
                   {shift.status}
                 </td>
-                <td className="px-8 py-5">
+                {/* <td className="px-8 py-5">
                   <div
                     onClick={() => setShiftModal(true)}
                     className="flex justify-center items-center cursor-pointer"
                   >
                     <IoIosArrowForward size={20} />
                   </div>
-                </td>
+                </td> */}
               </tr>
             ))}
           </tbody>

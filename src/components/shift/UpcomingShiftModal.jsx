@@ -17,10 +17,10 @@ const UpcomingShiftModal = ({
 }) => {
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className={"max-w-md p-8"}>
+      <DialogContent className={"max-w-md px-8"}>
         <DialogHeader>
           <div className="flex items-center justify-between w-full border-b-2 ">
-            <DialogTitle className="text-[28px] font-bold text-[#181818] py-2">
+            <DialogTitle className="text-[28px] font-bold text-[#181818] pb-2">
               Upcoming Shift
             </DialogTitle>
           </div>

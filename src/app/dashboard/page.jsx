@@ -56,7 +56,7 @@ const Dashboard = () => {
 
   return (
     <div>
-      <div className="flex justify-between items-center gap-10">
+      <div className="flex justify-between items-center gap-10 mt-4">
         <h1 className="section-heading">Dashboard</h1>
       </div>
 

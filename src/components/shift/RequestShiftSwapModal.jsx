@@ -13,7 +13,7 @@ const RequestShiftSwapModal = ({ isOpen, onOpenChange, setSuccessModal }) => {
   const [reason, setReason] = useState("");
 
   const [openField, setOpenField] = useState(null);
-  const [startDate, setStartDate] = useState("");
+  const [startTime, setStartTime] = useState(null);
 
   // Close dropdown on outside click
   useEffect(() => {
@@ -55,16 +55,14 @@ const RequestShiftSwapModal = ({ isOpen, onOpenChange, setSuccessModal }) => {
             </div>
           </div>
 
-          <div className="mb-2">
+          <div onClick={(e) => e.stopPropagation()} className="mb-2">
             <TimePickerField
               text="Swap Time"
               label="Select Swap Time"
-              value={startDate}
-              onChange={setStartDate}
-              open={openField === "start"}
-              onOpen={() =>
-                setOpenField(openField === "start" ? null : "start")
-              }
+              value={startTime}
+              onChange={setStartTime}
+              open={openField === "time"}
+              onOpen={() => setOpenField(openField === "time" ? null : "time")}
               position={"-left-4"}
             />
           </div>

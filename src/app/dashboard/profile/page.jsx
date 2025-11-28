@@ -13,7 +13,7 @@ const Profile = () => {
             <p className="text-[24px] text-[#252525] font-[600]">My Profile</p>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-gray-600 to-gray-800 flex items-center justify-center text-white font-semibold">
+            <div className="w-[78px] h-[78px] rounded-full bg-gradient-to-br from-gray-600 to-gray-800 flex items-center justify-center text-white font-semibold">
               MS
             </div>
             <p className="text-[20px] text-[#252525] font-[600]">Mike Smith</p>
@@ -35,7 +35,7 @@ const Profile = () => {
           <div className="bg-[#EFEFEF] rounded-[12px] p-4">
             <p className="text-[14px] font-[500] text-[#9E9E9E]">Address</p>
             <p className="text-[16px] text-[#252525]">
-              +123456789, abc123 , xyz
+              456 Maple Street, Anytown, NY 12345
             </p>
           </div>
         </div>
