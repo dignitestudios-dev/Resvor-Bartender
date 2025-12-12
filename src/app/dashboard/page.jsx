@@ -1,13 +1,17 @@
-import React from "react";
+"use client";
+import React, { useEffect, useState } from "react";
 import StatsCard from "@/components/dashboard/StatsCard";
 import { dashboardStats } from "@/lib/constants";
 import ShiftsCard from "@/components/dashboard/ShiftsCard";
 import RequestStatusCard from "@/components/dashboard/RequestStatusCard";
+import NotificationModal from "@/components/dashboard/NotificationModal";
 
 // import Table from "@/components/dashboard/Table";
 // import DateAndMonthFilter from "@/components/common/DateAndMonthFilter";
 
 const Dashboard = () => {
+  const [showModal, setShowModal] = useState(false);
+
   const dummyDate = new Date().toLocaleDateString("en-US", {
     weekday: "long",
     month: "short",
@@ -54,6 +58,10 @@ const Dashboard = () => {
     },
   ];
 
+  useEffect(() => {
+    setShowModal(true);
+  }, []);
+
   return (
     <div>
       <div className="flex justify-between items-center gap-10 mt-4">
@@ -87,6 +95,12 @@ const Dashboard = () => {
           </div>
         </div>
       </div>
+      {showModal && (
+        <NotificationModal
+          isOpen={showModal}
+          onOpenChange={(val) => setShowModal(val)}
+        />
+      )}
     </div>
   );
 };

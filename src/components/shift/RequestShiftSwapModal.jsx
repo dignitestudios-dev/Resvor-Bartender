@@ -8,6 +8,17 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import TimePickerField from "../global/TimePickerField";
+import { Label } from "../ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { workers } from "@/lib/constants";
 
 const RequestShiftSwapModal = ({ isOpen, onOpenChange, setSuccessModal }) => {
   const [reason, setReason] = useState("");
@@ -65,6 +76,28 @@ const RequestShiftSwapModal = ({ isOpen, onOpenChange, setSuccessModal }) => {
               onOpen={() => setOpenField(openField === "time" ? null : "time")}
               position={"-left-4"}
             />
+          </div>
+
+          <div className="col-span-2 flex flex-col gap-1 py-1">
+            <Label className={"text-[14px] text-[#181818] font-[500]"}>
+              Select to Replace With
+            </Label>
+
+            <Select>
+              <SelectTrigger className={"w-full h-10!"}>
+                <SelectValue placeholder="Select worker" />
+              </SelectTrigger>
+              <SelectContent className={"h-[200px]"}>
+                <SelectGroup>
+                  <SelectLabel>Months</SelectLabel>
+                  {workers.map((month, index) => (
+                    <SelectItem value={month} key={index}>
+                      {month}
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="mb-2">

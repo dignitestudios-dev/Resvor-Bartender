@@ -72,3 +72,5 @@ export const months = [
   "november",
   "december",
 ];
+
+export const workers = ["John", "Marshal", "Samantha", "April"];

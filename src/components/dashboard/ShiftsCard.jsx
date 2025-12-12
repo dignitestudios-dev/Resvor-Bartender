@@ -6,9 +6,9 @@ import { BiSolidBadgeDollar } from "react-icons/bi";
 const ShiftsCard = ({
   date = "Today",
   time = "06:00 PM - 02:00 AM",
-  location = "Main Bar",
+  location = "Main Lounge",
   eventType = "VIP Event - Premium Cocktail Menu",
-  role = "Bartender",
+  role = "Waiter",
 }) => {
   return (
     <div className="p-4 rounded-[18px] border-[1px] border-[#b9b9b950] bg-white">

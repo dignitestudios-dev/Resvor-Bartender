@@ -7,7 +7,7 @@ import RequestShiftSwapModal from "./RequestShiftSwapModal";
 import RequestTimeOffModal from "./RequestTimeOffModal";
 import SuccessModal from "../global/SuccessModal";
 
-const Table = () => {
+const Table = ({ startDate, endDate }) => {
   const [shiftModal, setShiftModal] = useState(false);
   const [timeOffOpen, setTimeOffOpen] = useState(false);
   const [shiftSwapOpen, setShiftSwapOpen] = useState(false);
@@ -121,6 +121,23 @@ const Table = () => {
     { key: "past", label: "Past" },
   ];
 
+  // filter shifts by provided date range (startDate and endDate are 'YYYY-MM-DD' or null)
+  const filteredShifts = shifts.filter((s) => {
+    if (!startDate && !endDate) return true;
+    const shiftDate = new Date(s.date);
+    if (startDate) {
+      const sd = new Date(startDate);
+      if (shiftDate < sd) return false;
+    }
+    if (endDate) {
+      const ed = new Date(endDate);
+      // include shifts on the end date as well
+      ed.setHours(23, 59, 59, 999);
+      if (shiftDate > ed) return false;
+    }
+    return true;
+  });
+
   return (
     <CustomPagination
       loading={false}
@@ -138,7 +155,7 @@ const Table = () => {
                    whitespace-nowrap
                   ${
                     activeTab === tab.key
-                      ? " text-blue-950 font-[600]"
+                      ? " text-blue-950 font-semibold"
                       : " text-[#727272] hover:text-gray-700 "
                   }
                 `}
@@ -172,30 +189,34 @@ const Table = () => {
             </tr>
           </thead>
           <tbody>
-            {shifts.map((shift, index) => (
-              <tr key={index} className="border-b border-[#D4D4D4]">
-                <td className="px-8 py-5">
-                  {shift.date}
-                  {/* {utils.formatDateWithName(shift.date)} */}
-                </td>
-                <td className="px-6 py-5">{shift.time}</td>
-                <td className="px-8 py-5">{shift.type}</td>
-                <td className="px-6 py-5">{shift.reason}</td>
-                <td className="px-8 py-5">{shift.submitted}</td>
-                <td className={`px-8 py-5 ${getStatusColor(shift.status)}`}>
-                  {/* {utils.capitalize(shift.status)} */}
-                  {shift.status}
-                </td>
-                <td className="px-8 py-5">
-                  <div
-                    onClick={() => setShiftModal(true)}
-                    className="flex justify-center items-center cursor-pointer"
-                  >
-                    <IoIosArrowForward size={20} />
-                  </div>
+            {filteredShifts.length > 0 ? (
+              filteredShifts.map((shift, index) => (
+                <tr key={index} className="border-b border-[#D4D4D4]">
+                  <td className="px-8 py-5">{shift.date}</td>
+                  <td className="px-6 py-5">{shift.time}</td>
+                  <td className="px-8 py-5">{shift.type}</td>
+                  <td className="px-6 py-5">{shift.reason}</td>
+                  <td className="px-8 py-5">{shift.submitted}</td>
+                  <td className={`px-8 py-5 ${getStatusColor(shift.status)}`}>
+                    {shift.status}
+                  </td>
+                  <td className="px-8 py-5">
+                    <div
+                      onClick={() => setShiftModal(true)}
+                      className="flex justify-center items-center cursor-pointer"
+                    >
+                      <IoIosArrowForward size={20} />
+                    </div>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan={7} className="py-8 text-center text-gray-500">
+                  No records found for selected dates.
                 </td>
               </tr>
-            ))}
+            )}
           </tbody>
         </table>
         {shiftModal && (

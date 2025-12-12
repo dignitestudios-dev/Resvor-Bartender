@@ -7,10 +7,10 @@ const inter = Inter({
 });
 
 export const metadata = {
-  title: "Resvor - Bartender",
-  description: "Resvor bartender dashboard",
+  title: "Work Force Management",
+  description: "Work force dashboard",
   icons: {
-    icon: "/public/logo.svg",
+    icon: "/logo.svg",
   },
 };
 
