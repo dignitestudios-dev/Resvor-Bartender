@@ -1,50 +1,54 @@
 "use client";
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { Send, Search } from "lucide-react";
 import { Button } from "../ui/button";
 
 export default function ChatUI() {
-  const [activeTab, setActiveTab] = useState("users");
-  const [selectedUser, setSelectedUser] = useState(null);
+  const fileInputRef = useRef(null);
+  const [messageInput, setMessageInput] = useState("");
 
-  const chats = [
+  const [chatState, setChatState] = useState([
     {
       id: 1,
-      sender: "John Doe",
-      message: "labore et dolore magna aliqua.",
-      time: "09:25 AM",
+      sender: "Manager",
+      message: "Hello! How can I help you today?",
+      time: "09:20 AM",
       isOwn: false,
     },
     {
       id: 2,
       sender: "You",
-      message:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elitelusmod tempor incididunt ut labore et dolore magna aliqua.",
-      time: "09:25 AM",
+      message: "I need some information regarding the lounge.",
+      time: "09:22 AM",
       isOwn: true,
     },
-    {
-      id: 3,
-      sender: "John Doe",
-      message: "labore et dolore magna aliqua.",
-      time: "09:25 AM",
-      isOwn: false,
-    },
-    {
-      id: 4,
-      sender: "John Doe",
-      message: "Sed ut perspiciatis",
-      time: "09:25 AM",
-      isOwn: false,
-    },
-    {
-      id: 5,
+  ]);
+  console.log("🚀 ~ ChatUI ~ chatState:", chatState);
+
+  const handleSendMessage = () => {
+    if (!messageInput.trim() && !fileInputRef.current?.files[0]) return;
+
+    const file = fileInputRef.current?.files[0];
+    console.log("🚀 ~ handleSendMessage ~ file:--->", file);
+    const newMessage = {
+      id: Date.now(),
       sender: "You",
-      message: "Lorem ipsum dolor sit ut labore et dolore magna aliqua.",
-      time: "09:25 AM",
+      message: messageInput,
+      image: file ? URL.createObjectURL(file) : null,
+      time: new Date().toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
       isOwn: true,
-    },
-  ];
+    };
+
+    setChatState((prev) => [...prev, newMessage]);
+    setMessageInput("");
+
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
 
   return (
     <div>
@@ -53,7 +57,7 @@ export default function ChatUI() {
       <div className="h-full flex bg-gray-50 rounded-2xl overflow-hidden">
         {/* Right Chat Area */}
         <div className="flex-1 flex flex-col">
-          {chats ? (
+          {chatState.length > 0 ? (
             <>
               {/* Chat Header */}
               <div className="bg-white border-b border-gray-200 p-4 flex items-center gap-3">
@@ -73,81 +77,48 @@ export default function ChatUI() {
                 </div>
 
                 {/* Chat Messages */}
-                {chats.map((chat) => (
-                  // <div
-                  //   key={chat.id}
-                  //   className={`flex ${
-                  //     chat.isOwn ? "justify-end" : "justify-start"
-                  //   }`}
-                  // >
-                  //   {!chat.isOwn && (
-                  //     <div className="w-10 h-10 rounded-full bg-gradient flex items-center justify-center text-white font-semibold mr-3 shrink-0">
-                  //       MR
-                  //     </div>
-                  //   )}
-
-                  //   <div className="flex flex-col items-end">
-                  //     <div
-                  //       className={`max-w-md rounded-lg ${
-                  //         chat.isOwn
-                  //           ? "bg-gradient text-white rounded-tr-none"
-                  //           : "bg-[#E6E6E6] text-gray-900 rounded-tl-none"
-                  //       } px-4 py-2`}
-                  //     >
-                  //       <p className="text-sm">{chat.message}</p>
-                  //     </div>
-
-                  //     <span className={`text-xs mt-1 text-black`}>
-                  //       {chat.time}
-                  //     </span>
-                  //   </div>
-                  // </div>
+                {chatState.map((chat) => (
                   <div
                     key={chat.id}
-                    className={
-                      chat.isOwn ? "flex justify-end" : "flex justify-start"
-                    }
+                    className={`flex ${
+                      chat.isOwn ? "justify-end" : "justify-start"
+                    }`}
                   >
-                    {/* avatar for incoming messages */}
                     {!chat.isOwn && (
-                      <div className="mx-2 w-10 h-10 rounded-full bg-gradient-to-br from-gray-600 to-gray-800 flex items-center justify-center text-white font-semibold flex-shrink-0">
+                      <div className="w-10 h-10 mr-2 rounded-full bg-gradient-to-br from-gray-600 to-gray-800 flex items-center justify-center text-white font-semibold">
                         MR
                       </div>
                     )}
 
                     <div
-                      className={`flex flex-col ${
-                        chat.isOwn ? "items-end" : "items-start"
+                      className={`max-w-md rounded-xl px-4 py-2 ${
+                        chat.isOwn
+                          ? "bg-gradient-to-br from-[#010067] to-black text-white rounded-tr-none"
+                          : "bg-gray-200 text-gray-900 rounded-tl-none"
                       }`}
                     >
-                      {/* show sender name above incoming messages */}
-                      {!chat.isOwn && (
-                        <span className="text-sm text-gray-500 mb-1 mt-1">
-                          Manager
-                        </span>
+                      {chat.image && (
+                        <img
+                          src={chat.image}
+                          alt="uploaded"
+                          className="mb-2 rounded-lg max-h-60 object-cover"
+                        />
                       )}
-
-                      <div
-                        className={`max-w-md rounded-lg ${
-                          chat.isOwn
-                            ? "bg-gradient-to-br from-[#010067] to-[#000000] text-white rounded-tr-none"
-                            : "bg-[#E6E6E6] text-gray-900 rounded-tl-none"
-                        } px-4 py-2`}
-                      >
-                        <p className="text-sm">{chat.message}</p>
-                      </div>
-
+                      {chat.message && (
+                        <p className="text-sm leading-relaxed">
+                          {chat.message}
+                        </p>
+                      )}
                       <span
-                        className={`text-xs mt-1 ${
-                          chat.isOwn ? "text-black" : "text-gray-500"
+                        className={`block text-xs mt-1 ${
+                          chat.isOwn ? "text-gray-200" : "text-gray-500"
                         }`}
                       >
                         {chat.time}
                       </span>
                     </div>
 
-                    {/* optional avatar placeholder for own messages to keep spacing consistent */}
-                    {chat.isOwn && <div className="w-10" />}
+                    {chat.isOwn && <div className="w-10 ml-2" />}
                   </div>
                 ))}
               </div>
@@ -170,10 +141,30 @@ export default function ChatUI() {
                   <input
                     type="text"
                     placeholder="Type Here..."
+                    value={messageInput}
+                    onChange={(e) => setMessageInput(e.target.value)}
+                    onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
                     className="flex-1 px-4 py-3 text-sm bg-transparent rounded-lg focus:outline-none focus:ring-2 focus:ring-primary "
                   />
-                  <button className="w-10 h-10 bg-indigo-950 text-white rounded-lg flex items-center justify-center hover:bg-primary/90 transition-all">
-                    <Send className="w-5 h-5" />
+                  {/* Hidden file input */}
+                  <input
+                    type="file"
+                    accept="image/*"
+                    ref={fileInputRef}
+                    className="hidden"
+                    onChange={() => handleSendMessage()}
+                  />
+                  <button
+                    onClick={() => fileInputRef.current?.click()}
+                    className=" bg-transparent text-white flex items-center justify-center hover:bg-gray-50 p-2 rounded-full transition-all"
+                  >
+                    📎
+                  </button>
+                  <button
+                    onClick={handleSendMessage}
+                    className="w-10 h-10 bg-indigo-950 text-white rounded-lg flex items-center justify-center hover:bg-primary/90 transition-all"
+                  >
+                    <Send className="w-4 h-4" />
                   </button>
                 </div>
               </div>
