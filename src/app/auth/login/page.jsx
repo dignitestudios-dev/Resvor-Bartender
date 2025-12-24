@@ -33,11 +33,11 @@ const Login = () => {
 
   return (
     <div className="grid lg:grid-cols-2 grid-cols-1 w-full text-white">
-      <div className="p-4 justify-center lg:flex hidden">
+      {/* <div className="p-4 justify-center lg:flex hidden">
         <div className="max-w-[489px]">
           <img src={"/loginSideImg.png"} alt="logo" className="w-[489px]" />
         </div>
-      </div>
+      </div> */}
       <div className="flex flex-col justify-center items-center h-auto ">
         <div className="my-8 space-y-3 xxl:w-[400px] xxl:ml-12 text-center">
           <p className=" xxl:text-[48px] text-[36px] font-[600] capitalize">
