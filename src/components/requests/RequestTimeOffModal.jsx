@@ -8,10 +8,45 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import DatePickerField from "../global/DatePickerField";
+import { useRequestTimeOff } from "@/lib/hooks/mutations/RequestMutations";
+import { toast } from "@/components/ui/toaster";
+import moment from "moment";
 
 const RequestTimeOffModal = ({ isOpen, onOpenChange, setSuccessModal }) => {
   const [reason, setReason] = useState("");
-  const [startDate, setStartDate] = useState(null);
+  const [date, setDate] = useState(null);
+
+  const { mutate: submitTimeOff, isPending } = useRequestTimeOff();
+
+  const handleSubmit = () => {
+    if (!date) {
+      toast.error("Please select a date.");
+      return;
+    }
+    if (!reason.trim()) {
+      toast.error("Please provide a reason.");
+      return;
+    }
+
+    const payload = {
+      date: moment(date).format("YYYY-MM-DD"),
+      reason: reason.trim(),
+    };
+
+    submitTimeOff(payload, {
+      onSuccess: () => {
+        onOpenChange(false);
+        setSuccessModal(true);
+      },
+      onError: (err) => {
+        const errorMsg =
+          err.response?.data?.message ||
+          err.message ||
+          "Failed to submit time off request.";
+        toast.error(errorMsg);
+      },
+    });
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
@@ -27,9 +62,10 @@ const RequestTimeOffModal = ({ isOpen, onOpenChange, setSuccessModal }) => {
         <div className="pt-1">
           <div className="mb-4">
             <DatePickerField
+              labelText="Select Date"
               label="Select Date"
-              value={startDate}
-              onChange={setStartDate}
+              value={date}
+              onChange={setDate}
             />
           </div>
 
@@ -55,12 +91,10 @@ const RequestTimeOffModal = ({ isOpen, onOpenChange, setSuccessModal }) => {
           <div className="w-full">
             <Button
               className={"w-full py-4 font-medium rounded-[12px]"}
-              onClick={() => {
-                onOpenChange(false);
-                setSuccessModal(true);
-              }}
+              onClick={handleSubmit}
+              disabled={isPending}
             >
-              Submit Request
+              {isPending ? "Submitting..." : "Submit Request"}
             </Button>
           </div>
         </DialogFooter>
@@ -70,3 +104,4 @@ const RequestTimeOffModal = ({ isOpen, onOpenChange, setSuccessModal }) => {
 };
 
 export default RequestTimeOffModal;
+

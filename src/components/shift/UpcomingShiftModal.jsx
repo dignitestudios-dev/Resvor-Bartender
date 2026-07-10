@@ -8,13 +8,27 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Button } from "../ui/button";
+import { useGetMyShiftById } from "@/lib/hooks/queries/useShifts";
+import utils from "@/lib/utils";
+import { Loader2 } from "lucide-react";
 
 const UpcomingShiftModal = ({
   isOpen,
   onOpenChange,
   setTimeOffOpen,
   setShiftSwapOpen,
+  shiftId,
 }) => {
+  const { data: shift, isLoading } = useGetMyShiftById(shiftId, {
+    enabled: isOpen && !!shiftId,
+  });
+
+  const name = shift?.referenceId?.title || shift?.referenceId?.name || shift?.referenceId || "-";
+  const dateStr = shift?.startDateTime ? utils.formatDateWithName(shift.startDateTime) : "-";
+  const startTimeStr = shift?.startDateTime ? utils.formatTime12(shift.startDateTime) : "";
+  const endTimeStr = shift?.endDateTime ? utils.formatTime12(shift.endDateTime) : "";
+  const timeStr = startTimeStr && endTimeStr ? `${startTimeStr} - ${endTimeStr}` : startTimeStr || "-";
+
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className={"max-w-md px-8"}>
@@ -26,56 +40,65 @@ const UpcomingShiftModal = ({
           </div>
         </DialogHeader>
 
-        <div className="">
-          <h4 className="text-[16px] text-[#181818] font-semibold mb-3">
-            Shift Details
-          </h4>
+        {isLoading ? (
+          <div className="flex items-center justify-center py-12">
+            <Loader2 className="animate-spin text-blue-950" size={36} />
+          </div>
+        ) : shift ? (
+          <div className="">
+            <h4 className="text-[16px] text-[#181818] font-semibold mb-3">
+              Shift Details
+            </h4>
 
-          <div className="grid grid-cols-3 gap-4 mb-4">
-            <div>
-              <p className="text-[14px] font-medium text-[#737373]">Date</p>
-              <p className="text-[14px] font-semibold text-[#181818] mt-1">
-                26 Dec, 2024
+            <div className="grid grid-cols-3 gap-4 mb-4">
+              <div>
+                <p className="text-[14px] font-medium text-[#737373]">Date</p>
+                <p className="text-[14px] font-semibold text-[#181818] mt-1">
+                  {dateStr}
+                </p>
+              </div>
+              <div>
+                <p className="text-[14px] font-medium text-[#737373]">Time</p>
+                <p className="text-[14px] font-semibold text-[#181818] mt-1">
+                  {timeStr}
+                </p>
+              </div>
+              <div>
+                <p className="text-[14px] font-medium text-[#737373]">Role</p>
+                <p className="text-[14px] font-semibold text-[#181818] mt-1">
+                  {shift.role || "-"}
+                </p>
+              </div>
+            </div>
+
+            <hr className="border-t-2 mb-4" />
+
+            <div className="mb-4">
+              <p className="text-[14px] font-semibold text-[#181818] mb-2">
+                Event
+              </p>
+              <p className="text-[14px] text-[#737373]">
+                {name}
               </p>
             </div>
-            <div>
-              <p className="text-[14px] font-medium text-[#737373]">Time</p>
-              <p className="text-[14px] font-semibold text-[#181818] mt-1">
-                06:00pm
+
+            <hr className="border-t-2 mb-4" />
+
+            <div className="mb-6">
+              <p className="text-sm text-[#111827] font-semibold mb-2">
+                Any Instruction{" "}
+                <span className="text-sm text-[#9CA3AF]">(optional)</span>
               </p>
-            </div>
-            <div>
-              <p className="text-[14px] font-medium text-[#737373]">Role</p>
-              <p className="text-[14px] font-semibold text-[#181818] mt-1">
-                Bar Server
+              <p className="text-[14px] text-[#636363]">
+                {shift.instructions || "No instructions provided."}
               </p>
             </div>
           </div>
-
-          <hr className="border-t-2 mb-4" />
-
-          <div className="mb-4">
-            <p className="text-[14px] font-semibold text-[#181818] mb-2">
-              Event
-            </p>
-            <p className="text-[14px] text-[#737373]">
-              Corporate Networking Night
-            </p>
+        ) : (
+          <div className="text-center py-8 text-gray-500">
+            Failed to load shift details.
           </div>
-
-          <hr className="border-t-2 mb-4" />
-
-          <div className="mb-6">
-            <p className="text-sm text-[#111827] font-semibold mb-2">
-              Any Instruction{" "}
-              <span className="text-sm text-[#9CA3AF]">(optional)</span>
-            </p>
-            <p className="text-[14px] text-[#636363]">
-              The standard Lorem Ipsum passage, m ipsum dolor sit amet, cectetur
-              adipiscing elit, sed do eiusmod. The standard.
-            </p>
-          </div>
-        </div>
+        )}
 
         <DialogFooter>
           <div className="flex justify-center gap-4 w-full">
@@ -85,6 +108,7 @@ const UpcomingShiftModal = ({
                 setTimeOffOpen(true);
               }}
               className={" py-3 px-4 font-medium "}
+              disabled={isLoading}
             >
               Request Time Off
             </Button>
@@ -95,6 +119,7 @@ const UpcomingShiftModal = ({
                 setShiftSwapOpen(true);
               }}
               className={" py-3 px-4 font-medium "}
+              disabled={isLoading}
             >
               Request Shift Swap
             </Button>

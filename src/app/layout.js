@@ -1,5 +1,8 @@
 import { Inter } from "next/font/google";
 import "./globals.css";
+import { Toaster } from "@/components/ui/toaster";
+
+import ReactQueryProvider from "@/lib/hooks/query/ReactQueryProvider";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -20,8 +23,12 @@ export default function RootLayout({ children }) {
       <body
         className={`${inter.className} antialiased bg-[#F4F4FF] overflow-x-hidden`}
       >
-        {children}
+        <ReactQueryProvider>
+          {children}
+        </ReactQueryProvider>
+        <Toaster />
       </body>
     </html>
   );
 }
+

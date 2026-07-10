@@ -10,6 +10,7 @@ import moment from "moment";
 
 const DatePickerField = ({
   label = "Select Date",
+  labelText = "Date",
   value,
   onChange,
   minDate = undefined,
@@ -21,7 +22,7 @@ const DatePickerField = ({
   return (
     <div className="relative w-full">
       <label className="text-[14px] text-[#181818] font-[500] block">
-        Date
+        {labelText}
       </label>
 
       <Popover open={open} onOpenChange={setOpen}>

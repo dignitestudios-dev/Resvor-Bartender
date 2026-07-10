@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -7,8 +7,6 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import TimePickerField from "../global/TimePickerField";
-import DatePickerField from "../global/DatePickerField";
 import { Label } from "../ui/label";
 import {
   Select,
@@ -19,22 +17,80 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { workers } from "@/lib/constants";
+import { useGetMyShifts, useGetAllShifts } from "@/lib/hooks/queries/useShifts";
+import { useAuthMe } from "@/lib/hooks/queries/useQueries";
+import { useRequestShiftSwap } from "@/lib/hooks/mutations/RequestMutations";
+import { toast } from "@/components/ui/toaster";
+import utils from "@/lib/utils";
 
 const RequestShiftSwapModal = ({ isOpen, onOpenChange, setSuccessModal }) => {
   const [reason, setReason] = useState("");
+  const [selectedMyShiftId, setSelectedMyShiftId] = useState("");
+  const [selectedTargetShiftId, setSelectedTargetShiftId] = useState("");
 
-  const [openField, setOpenField] = useState(null);
-  const [startTime, setStartTime] = useState(null);
+  const { data: myShiftsRes, isLoading: myShiftsLoading } = useGetMyShifts({ limit: 100 });
+  const { data: targetShiftsRes, isLoading: targetShiftsLoading } = useGetAllShifts({ limit: 100 });
 
-  const [startDate, setStartDate] = useState(null);
+  const { data: currentUser } = useAuthMe();
+  const currentUserId = currentUser?._id || currentUser?.id;
 
-  // Close dropdown on outside click
-  useEffect(() => {
-    const close = () => setOpenField(null);
-    window.addEventListener("click", close);
-    return () => window.removeEventListener("click", close);
-  }, []);
+  const myShifts = myShiftsRes?.data || [];
+
+  const getBartenderName = (bartender) => {
+    if (!bartender) return "";
+    if (typeof bartender === "string") return "";
+    return `${bartender.firstName || ""} ${bartender.lastName || ""}`.trim() || bartender.name || bartender.email || "";
+  };
+
+  const targetShifts = (targetShiftsRes?.data || []).filter((shift) => {
+    const bId = shift.bartenderId?._id || shift.bartenderId;
+    return bId !== currentUserId && shift._id !== selectedMyShiftId;
+  });
+
+  const { mutate: submitShiftSwap, isPending } = useRequestShiftSwap();
+
+  const formatShiftLabel = (shift) => {
+    const startStr = utils.formatTime12(shift.startDateTime);
+    const endStr = utils.formatTime12(shift.endDateTime);
+    const bartenderName = getBartenderName(shift.bartenderId);
+    const suffix = bartenderName ? ` - ${bartenderName}` : "";
+    return `${utils.formatDateWithName(shift.startDateTime)} (${startStr} - ${endStr}) - ${shift.role || "Bartender"}${suffix}`;
+  };
+
+  const handleSubmit = () => {
+    if (!selectedMyShiftId) {
+      toast.error("Please select one of your shifts to swap.");
+      return;
+    }
+    if (!selectedTargetShiftId) {
+      toast.error("Please select the target shift to swap with.");
+      return;
+    }
+    if (!reason.trim()) {
+      toast.error("Please provide a reason.");
+      return;
+    }
+
+    const payload = {
+      requestorShiftId: selectedMyShiftId,
+      targetShiftId: selectedTargetShiftId,
+      reason: reason.trim(),
+    };
+
+    submitShiftSwap(payload, {
+      onSuccess: () => {
+        onOpenChange(false);
+        setSuccessModal(true);
+      },
+      onError: (err) => {
+        const errorMsg =
+          err.response?.data?.message ||
+          err.message ||
+          "Failed to submit shift swap request.";
+        toast.error(errorMsg);
+      },
+    });
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
@@ -47,56 +103,78 @@ const RequestShiftSwapModal = ({ isOpen, onOpenChange, setSuccessModal }) => {
           </div>
         </DialogHeader>
 
-        <div className="">
-          <div className="grid grid-cols-2 gap-4 mb-2">
-            <div>
-              <DatePickerField
-                label="Select Date"
-                value={startDate}
-                onChange={setStartDate}
-              />
-            </div>
-            <div onClick={(e) => e.stopPropagation()}>
-              <TimePickerField
-                text="Swap Time"
-                label="Select Swap Time"
-                value={startTime}
-                onChange={setStartTime}
-                open={openField === "time"}
-                onOpen={() =>
-                  setOpenField(openField === "time" ? null : "time")
-                }
-                position={"right-0"}
-              />
-            </div>
-          </div>
-
-          <div className="col-span-2 flex flex-col gap-1 py-1">
-            <Label className={"text-[14px] text-[#181818] font-[500]"}>
-              Select to Replace With
+        <div className="flex flex-col gap-4 mt-2">
+          {/* Select Your Shift */}
+          <div className="flex flex-col gap-1">
+            <Label className="text-[14px] text-[#181818] font-[500]">
+              Select Your Shift to Swap
             </Label>
-
-            <Select>
-              <SelectTrigger className={"w-full h-10!"}>
-                <SelectValue placeholder="Select a worker" />
+            <Select onValueChange={setSelectedMyShiftId} value={selectedMyShiftId}>
+              <SelectTrigger className="w-full h-10!">
+                <SelectValue placeholder={myShiftsLoading ? "Loading your shifts..." : "Select your shift"} />
               </SelectTrigger>
-              <SelectContent className={"h-[200px]"}>
+              <SelectContent className="max-h-[200px]">
                 <SelectGroup>
-                  <SelectLabel>Workers</SelectLabel>
-                  {workers.map((month, index) => (
-                    <SelectItem value={month} key={index}>
-                      {month}
+                  <SelectLabel>Your Shifts</SelectLabel>
+                  {myShifts.length > 0 ? (
+                    myShifts.map((shift) => (
+                      <SelectItem key={shift._id} value={shift._id}>
+                        {formatShiftLabel(shift)}
+                      </SelectItem>
+                    ))
+                  ) : (
+                    <SelectItem value="none" disabled>
+                      No shifts found
                     </SelectItem>
-                  ))}
+                  )}
                 </SelectGroup>
               </SelectContent>
             </Select>
           </div>
 
-          <div className="mb-2">
-            <p className="text-[14px] font-semibold text-[#181818] mb-2">
+          {/* Select Target Shift */}
+          <div className="flex flex-col gap-1">
+            <Label className="text-[14px] text-[#181818] font-[500]">
+              Select Shift to Swap With
+            </Label>
+            <Select
+              onValueChange={setSelectedTargetShiftId}
+              value={selectedTargetShiftId}
+              disabled={targetShiftsLoading}
+            >
+              <SelectTrigger className="w-full h-10!">
+                <SelectValue
+                  placeholder={
+                    targetShiftsLoading
+                      ? "Loading shifts..."
+                      : "Select shift"
+                  }
+                />
+              </SelectTrigger>
+              <SelectContent className="max-h-[200px]">
+                <SelectGroup>
+                  <SelectLabel>Available Shifts</SelectLabel>
+                  {targetShifts.length > 0 ? (
+                    targetShifts.map((shift) => (
+                      <SelectItem key={shift._id} value={shift._id}>
+                        {formatShiftLabel(shift)}
+                      </SelectItem>
+                    ))
+                  ) : (
+                    <SelectItem value="none" disabled>
+                      No shifts found
+                    </SelectItem>
+                  )}
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Reason */}
+          <div>
+            <Label className="text-[14px] font-semibold text-[#181818] mb-2 block">
               Reason For Request
-            </p>
+            </Label>
             <textarea
               value={reason}
               onChange={(e) => setReason(e.target.value)}
@@ -105,22 +183,20 @@ const RequestShiftSwapModal = ({ isOpen, onOpenChange, setSuccessModal }) => {
             />
           </div>
 
-          <p className="text-[12px] text-[#202224] mb-2">
+          <p className="text-[12px] text-[#202224]">
             Your request will be sent to your Lounge Manager for review and
             approval. You will be notified once a decision has been made.
           </p>
         </div>
 
         <DialogFooter>
-          <div className="w-full">
+          <div className="w-full mt-4">
             <Button
               className={"w-full py-4 font-medium rounded-[12px]"}
-              onClick={() => {
-                onOpenChange(false);
-                setSuccessModal(true);
-              }}
+              onClick={handleSubmit}
+              disabled={isPending}
             >
-              Submit Request
+              {isPending ? "Submitting..." : "Submit Request"}
             </Button>
           </div>
         </DialogFooter>

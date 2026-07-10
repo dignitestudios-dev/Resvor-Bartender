@@ -4,7 +4,10 @@ import { logInSchema } from "../../../schema/authentication/loginSchema";
 import AuthInput from "../../../components/auth/AuthInput";
 import AuthButton from "../../../components/auth/AuthButton";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import Cookies from "js-cookie";
+
+import { ErrorToast, toast } from "../../../components/ui/toaster";
+import { useLogin } from "../../../lib/hooks/mutations/AuthMutations";
 
 const loginValues = {
   email: "",
@@ -13,7 +16,7 @@ const loginValues = {
 
 const Login = () => {
   const router = useRouter();
-  const [loading, setLoading] = useState(false);
+  const loginMutation = useLogin();
 
   const { values, handleBlur, handleChange, handleSubmit, errors, touched } =
     useFormik({
@@ -21,13 +24,32 @@ const Login = () => {
       validationSchema: logInSchema,
       validateOnChange: true,
       validateOnBlur: true,
-      onSubmit: async (values, action) => {
-        console.log("🚀 ~ Login ~ action:", action);
-        const data = {
-          email: values?.email,
-          password: values?.password,
-        };
-        router.push("/app/dashboard");
+      onSubmit: async (values) => {
+        try {
+          const response = await loginMutation.mutateAsync({
+            email: values.email,
+            password: values.password,
+            role: "bartender",
+          });
+
+          const { token, accessToken } = response?.data ?? {};
+          const activeToken = token || accessToken || response?.token || response?.accessToken;
+
+          if (activeToken) {
+            Cookies.set("token", activeToken, { expires: 7, path: "/" });
+            Cookies.set("authorization", activeToken, { expires: 7, path: "/" });
+          }
+
+          toast.success("Login successful!");
+          router.push("/dashboard");
+        } catch (error) {
+          ErrorToast(
+            error?.code === "NO_INTERNET"
+              ? error.message
+              : (error.response?.data?.message ??
+                  "Invalid credentials. Please try again."),
+          );
+        }
       },
     });
 
@@ -97,11 +119,10 @@ const Login = () => {
 
             <div className="xxl:w-[650px] w-[350px] mt-1 mb-4">
               <AuthButton
-                onClick={() => router.push("/dashboard")}
-                type="button"
+                type="submit"
                 text={"Login"}
-                loading={loading}
-                disabled={loading}
+                loading={loginMutation.isPending}
+                disabled={loginMutation.isPending}
               />
             </div>
           </div>

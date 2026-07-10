@@ -6,98 +6,31 @@ import UpcomingShiftModal from "./UpcomingShiftModal";
 import RequestShiftSwapModal from "./RequestShiftSwapModal";
 import RequestTimeOffModal from "./RequestTimeOffModal";
 import SuccessModal from "../global/SuccessModal";
+import { useGetMyShifts } from "@/lib/hooks/queries/useShifts";
+import utils from "@/lib/utils";
 
 const Table = ({ startDate, endDate }) => {
   const [shiftModal, setShiftModal] = useState(false);
   const [timeOffOpen, setTimeOffOpen] = useState(false);
   const [shiftSwapOpen, setShiftSwapOpen] = useState(false);
   const [successModal, setSuccessModal] = useState(false);
+  const [selectedShiftId, setSelectedShiftId] = useState(null);
 
-  const shifts = [
-    {
-      date: "2025-12-01",
-      time: "06:00 PM - 12:00 AM",
-      type: "Bartender",
-      reason: "Team Building Event",
-      submitted: "Requested by HR",
-      status: "pending",
-    },
-    {
-      date: "2025-12-02",
-      time: "05:30 PM - 11:30 PM",
-      type: "Head Bartender",
-      reason: "Product Launch",
-      submitted: "Auto-assigned",
-      status: "confirmed",
-    },
-    {
-      date: "2025-12-03",
-      time: "07:00 PM - 01:00 AM",
-      type: "Assistant Bartender",
-      reason: "Wedding Ceremony",
-      submitted: "Requested by client",
-      status: "unfilled",
-    },
-    {
-      date: "2025-12-04",
-      time: "04:00 PM - 10:00 PM",
-      type: "Bar Manager",
-      reason: "VIP Dinner",
-      submitted: "Manual entry",
-      status: "pending",
-    },
-    {
-      date: "2025-12-05",
-      time: "08:00 PM - 02:00 AM",
-      type: "Bartender",
-      reason: "Club Night",
-      submitted: "Auto-assigned",
-      status: "confirmed",
-    },
-    {
-      date: "2025-12-06",
-      time: "06:30 PM - 12:30 AM",
-      type: "Head Bartender",
-      reason: "Charity Auction",
-      submitted: "Requested by sponsor",
-      status: "pending",
-    },
-    {
-      date: "2025-12-07",
-      time: "05:00 PM - 11:00 PM",
-      type: "Assistant Bartender",
-      reason: "Holiday Market",
-      submitted: "Manual entry",
-      status: "unfilled",
-    },
-    {
-      date: "2025-12-08",
-      time: "07:30 PM - 01:30 AM",
-      type: "Bar Manager",
-      reason: "Fashion Show",
-      submitted: "Requested by organizer",
-      status: "confirmed",
-    },
-    {
-      date: "2025-12-09",
-      time: "06:00 PM - 11:00 PM",
-      type: "Bartender",
-      reason: "Live Music Night",
-      submitted: "Auto-assigned",
-      status: "pending",
-    },
-    {
-      date: "2025-12-10",
-      time: "05:30 PM - 10:30 PM",
-      type: "Head Bartender",
-      reason: "Corporate Dinner",
-      submitted: "Requested by CEO",
-      status: "confirmed",
-    },
-  ];
+  const [page, setPage] = useState(1);
+  const LIMIT = 10;
+
+  const { data: shiftsResponse, isLoading } = useGetMyShifts({
+    page,
+    limit: LIMIT,
+    startDate: startDate || "",
+    endDate: endDate || "",
+  });
+
+  const shifts = shiftsResponse?.data || [];
+  const totalPages = shiftsResponse?.pagination?.totalPages || 1;
 
   const getStatusColor = (status) => {
-    switch (status) {
+    switch (status?.toLowerCase()) {
       case "pending":
         return "text-[#FFAE10]"; // orange
       case "unfilled":
@@ -109,8 +42,8 @@ const Table = ({ startDate, endDate }) => {
     }
   };
 
-  const onPageChange = (page) => {
-    // handle pagination
+  const onPageChange = (newPage) => {
+    setPage(newPage);
   };
 
   const [activeTab, setActiveTab] = useState("all");
@@ -121,28 +54,41 @@ const Table = ({ startDate, endDate }) => {
     { key: "past", label: "Past" },
   ];
 
-  // filter shifts by provided date range (startDate and endDate are 'YYYY-MM-DD' or null)
-  const filteredShifts = shifts.filter((s) => {
-    if (!startDate && !endDate) return true;
-    const shiftDate = new Date(s.date);
-    if (startDate) {
-      const sd = new Date(startDate);
-      if (shiftDate < sd) return false;
+  // Map API response to visually normalized shifts
+  const normalizedShifts = shifts.map((shift) => {
+    const startStr = utils.formatTime12(shift.startDateTime);
+    const endStr = utils.formatTime12(shift.endDateTime);
+    return {
+      _id: shift._id,
+      date: utils.formatDateWithName(shift.startDateTime) || "-",
+      time: startStr && endStr ? `${startStr} - ${endStr}` : "-",
+      type: shift.role || "-",
+      reason: shift.referenceId?.title || shift.referenceId?.name || shift.referenceId || "-",
+      submitted: shift.instructions || "-",
+      status: shift.status || "pending",
+      startDateTime: shift.startDateTime,
+    };
+  });
+
+  // Client-side filtering for activeTab (Upcoming/Past/All)
+  const filteredShifts = normalizedShifts.filter((s) => {
+    if (!s.startDateTime) return true;
+    const shiftDate = new Date(s.startDateTime);
+    const now = new Date();
+    if (activeTab === "upcoming") {
+      return shiftDate >= now;
     }
-    if (endDate) {
-      const ed = new Date(endDate);
-      // include shifts on the end date as well
-      ed.setHours(23, 59, 59, 999);
-      if (shiftDate > ed) return false;
+    if (activeTab === "past") {
+      return shiftDate < now;
     }
     return true;
   });
 
   return (
     <CustomPagination
-      loading={false}
+      loading={isLoading}
       onPageChange={onPageChange}
-      totalPages={5}
+      totalPages={totalPages}
     >
       <div className="bg-white rounded-xl overflow-y-auto">
         <nav className="flex flex-wrap gap-1 md:gap-2 mx-3">
@@ -202,7 +148,10 @@ const Table = ({ startDate, endDate }) => {
                   </td>
                   <td className="px-8 py-5">
                     <div
-                      onClick={() => setShiftModal(true)}
+                      onClick={() => {
+                        setSelectedShiftId(shift._id);
+                        setShiftModal(true);
+                      }}
                       className="flex justify-center items-center cursor-pointer"
                     >
                       <IoIosArrowForward size={20} />
@@ -213,7 +162,7 @@ const Table = ({ startDate, endDate }) => {
             ) : (
               <tr>
                 <td colSpan={7} className="py-8 text-center text-gray-500">
-                  No records found for selected dates.
+                  No records found for selected filters.
                 </td>
               </tr>
             )}
@@ -225,6 +174,7 @@ const Table = ({ startDate, endDate }) => {
             onOpenChange={setShiftModal}
             setTimeOffOpen={setTimeOffOpen}
             setShiftSwapOpen={setShiftSwapOpen}
+            shiftId={selectedShiftId}
           />
         )}
 
