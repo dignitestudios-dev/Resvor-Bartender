@@ -47,7 +47,7 @@ const Login = () => {
             error?.code === "NO_INTERNET"
               ? error.message
               : (error.response?.data?.message ??
-                  "Invalid credentials. Please try again."),
+                "Invalid credentials. Please try again."),
           );
         }
       },

@@ -29,7 +29,7 @@ export default function ChatUI() {
     if (!messageInput.trim() && !fileInputRef.current?.files[0]) return;
 
     const file = fileInputRef.current?.files[0];
-    console.log("🚀 ~ handleSendMessage ~ file:--->", file);
+    
     const newMessage = {
       id: Date.now(),
       sender: "You",
