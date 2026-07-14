@@ -5,12 +5,15 @@ import { dashboardStats } from "@/lib/constants";
 import ShiftsCard from "@/components/dashboard/ShiftsCard";
 import RequestStatusCard from "@/components/dashboard/RequestStatusCard";
 import NotificationModal from "@/components/dashboard/NotificationModal";
+import { useGetNotifications } from "@/lib/hooks/queries/useNotifications";
 
 // import Table from "@/components/dashboard/Table";
 // import DateAndMonthFilter from "@/components/common/DateAndMonthFilter";
 
 const Dashboard = () => {
   const [showModal, setShowModal] = useState(false);
+  const { data: notifications = [], isLoading: notificationsLoading } =
+    useGetNotifications();
 
   const dummyDate = new Date().toLocaleDateString("en-US", {
     weekday: "long",
@@ -58,9 +61,15 @@ const Dashboard = () => {
     },
   ];
 
+  // Show modal only when notifications have loaded and there is at least one unread
   useEffect(() => {
-    setShowModal(true);
-  }, []);
+    if (!notificationsLoading) {
+      const unreadCount = notifications.filter(
+        (n) => !(n.read === true || n.isRead === true)
+      ).length;
+      setShowModal(unreadCount > 0);
+    }
+  }, [notifications, notificationsLoading]);
 
   return (
     <div>

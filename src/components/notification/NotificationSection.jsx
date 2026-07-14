@@ -161,7 +161,7 @@ const NotificationSection = () => {
               ))}
             </div>
           ) : (
-            <div className="h-[430px]">No record found</div>
+            <div className="h-[430px] w-full flex items-center justify-center">No record found</div>
           )}
         </div>
       )}
