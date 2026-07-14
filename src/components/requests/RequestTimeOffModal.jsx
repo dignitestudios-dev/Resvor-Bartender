@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -12,9 +12,16 @@ import { useRequestTimeOff } from "@/lib/hooks/mutations/RequestMutations";
 import { toast } from "@/components/ui/toaster";
 import moment from "moment";
 
-const RequestTimeOffModal = ({ isOpen, onOpenChange, setSuccessModal }) => {
+const RequestTimeOffModal = ({ isOpen, onOpenChange, setSuccessModal, defaultDate }) => {
   const [reason, setReason] = useState("");
   const [date, setDate] = useState(null);
+
+  useEffect(() => {
+    if (isOpen) {
+      setDate(defaultDate ? new Date(defaultDate) : null);
+      setReason("");
+    }
+  }, [isOpen, defaultDate]);
 
   const { mutate: submitTimeOff, isPending } = useRequestTimeOff();
 
