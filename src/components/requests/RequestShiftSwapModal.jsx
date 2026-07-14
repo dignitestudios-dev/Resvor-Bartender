@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -23,10 +23,18 @@ import { useRequestShiftSwap } from "@/lib/hooks/mutations/RequestMutations";
 import { toast } from "@/components/ui/toaster";
 import utils from "@/lib/utils";
 
-const RequestShiftSwapModal = ({ isOpen, onOpenChange, setSuccessModal }) => {
+const RequestShiftSwapModal = ({ isOpen, onOpenChange, setSuccessModal, defaultShiftId }) => {
   const [reason, setReason] = useState("");
   const [selectedMyShiftId, setSelectedMyShiftId] = useState("");
   const [selectedTargetShiftId, setSelectedTargetShiftId] = useState("");
+
+  useEffect(() => {
+    if (isOpen) {
+      setSelectedMyShiftId(defaultShiftId || "");
+      setReason("");
+      setSelectedTargetShiftId("");
+    }
+  }, [isOpen, defaultShiftId]);
 
   const { data: myShiftsRes, isLoading: myShiftsLoading } = useGetMyShifts({ limit: 100 });
   const { data: targetShiftsRes, isLoading: targetShiftsLoading } = useGetAllShifts({ limit: 100 });
@@ -39,11 +47,12 @@ const RequestShiftSwapModal = ({ isOpen, onOpenChange, setSuccessModal }) => {
   const getBartenderName = (bartender) => {
     if (!bartender) return "";
     if (typeof bartender === "string") return "";
-    return `${bartender.firstName || ""} ${bartender.lastName || ""}`.trim() || bartender.name || bartender.email || "";
+    return bartender.fullName || `${bartender.firstName || ""} ${bartender.lastName || ""}`.trim() || bartender.name || bartender.email || "";
   };
 
   const targetShifts = (targetShiftsRes?.data || []).filter((shift) => {
-    const bId = shift.bartenderId?._id || shift.bartenderId;
+    const bartender = shift.bartenderIds?.[0] || shift.bartenderId;
+    const bId = bartender && typeof bartender === "object" ? bartender._id : bartender;
     return bId !== currentUserId && shift._id !== selectedMyShiftId;
   });
 
@@ -52,7 +61,8 @@ const RequestShiftSwapModal = ({ isOpen, onOpenChange, setSuccessModal }) => {
   const formatShiftLabel = (shift) => {
     const startStr = utils.formatTime12(shift.startDateTime);
     const endStr = utils.formatTime12(shift.endDateTime);
-    const bartenderName = getBartenderName(shift.bartenderId);
+    const bartender = shift.bartenderIds?.[0] || shift.bartenderId;
+    const bartenderName = getBartenderName(bartender);
     const suffix = bartenderName ? ` - ${bartenderName}` : "";
     return `${utils.formatDateWithName(shift.startDateTime)} (${startStr} - ${endStr}) - ${shift.role || "Bartender"}${suffix}`;
   };
@@ -70,6 +80,12 @@ const RequestShiftSwapModal = ({ isOpen, onOpenChange, setSuccessModal }) => {
       toast.error("Please provide a reason.");
       return;
     }
+
+    const selectedTargetShift = targetShifts.find((s) => s._id === selectedTargetShiftId);
+    const targetBartender = selectedTargetShift?.bartenderIds?.[0] || selectedTargetShift?.bartenderId;
+    const targetBartenderId = targetBartender && typeof targetBartender === "object"
+      ? targetBartender._id
+      : targetBartender;
 
     const payload = {
       requestorShiftId: selectedMyShiftId,
@@ -94,7 +110,7 @@ const RequestShiftSwapModal = ({ isOpen, onOpenChange, setSuccessModal }) => {
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className={"w-[440px] px-8"}>
+      <DialogContent className={""}>
         <DialogHeader>
           <div className="flex items-center justify-between w-full border-b-2">
             <DialogTitle className="text-[24px] font-bold text-[#181818] pb-2">
@@ -103,9 +119,9 @@ const RequestShiftSwapModal = ({ isOpen, onOpenChange, setSuccessModal }) => {
           </div>
         </DialogHeader>
 
-        <div className="flex flex-col gap-4 mt-2">
+        <div className="flex relative flex-col gap-4 mt-2">
           {/* Select Your Shift */}
-          <div className="flex flex-col gap-1">
+          <div className="flex  flex-col gap-1">
             <Label className="text-[14px] text-[#181818] font-[500]">
               Select Your Shift to Swap
             </Label>

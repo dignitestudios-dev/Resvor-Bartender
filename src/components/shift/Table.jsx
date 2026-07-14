@@ -3,8 +3,8 @@ import React, { useState } from "react";
 import CustomPagination from "@/components/common/CustomPagination";
 import { IoIosArrowForward } from "react-icons/io";
 import UpcomingShiftModal from "./UpcomingShiftModal";
-import RequestShiftSwapModal from "./RequestShiftSwapModal";
-import RequestTimeOffModal from "./RequestTimeOffModal";
+import RequestShiftSwapModal from "@/components/requests/RequestShiftSwapModal";
+import RequestTimeOffModal from "@/components/requests/RequestTimeOffModal";
 import SuccessModal from "../global/SuccessModal";
 import { useGetMyShifts } from "@/lib/hooks/queries/useShifts";
 import utils from "@/lib/utils";
@@ -184,6 +184,11 @@ const Table = ({ startDate, endDate }) => {
             isOpen={timeOffOpen}
             onOpenChange={(val) => setTimeOffOpen(val)}
             setSuccessModal={setSuccessModal}
+            defaultDate={
+              selectedShiftId
+                ? shifts.find((s) => s._id === selectedShiftId)?.startDateTime
+                : null
+            }
           />
         )}
         {shiftSwapOpen && (
@@ -191,6 +196,7 @@ const Table = ({ startDate, endDate }) => {
             isOpen={shiftSwapOpen}
             onOpenChange={(val) => setShiftSwapOpen(val)}
             setSuccessModal={setSuccessModal}
+            defaultShiftId={selectedShiftId}
           />
         )}
         {successModal && (

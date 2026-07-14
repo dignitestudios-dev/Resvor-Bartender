@@ -35,7 +35,7 @@ const RequestShiftSwapModal = ({ isOpen, onOpenChange, setSuccessModal }) => {
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className={"w-[440px] px-8"}>
+      <DialogContent className={" px-8"}>
         <DialogHeader>
           <div className="flex items-center justify-between w-full border-b-2">
             <DialogTitle className="text-[24px] font-bold text-[#181818] pb-2">
