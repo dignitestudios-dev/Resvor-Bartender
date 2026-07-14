@@ -7,7 +7,8 @@ import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
 
 import { ErrorToast, toast } from "../../../components/ui/toaster";
-import { useLogin } from "../../../lib/hooks/mutations/AuthMutations";
+import { useLogin, useUpdateFcmToken } from "../../../lib/hooks/mutations/AuthMutations";
+import { requestForToken } from "../../../lib/firebase";
 
 const loginValues = {
   email: "",
@@ -17,6 +18,7 @@ const loginValues = {
 const Login = () => {
   const router = useRouter();
   const loginMutation = useLogin();
+  const updateFcmMutation = useUpdateFcmToken();
 
   const { values, handleBlur, handleChange, handleSubmit, errors, touched } =
     useFormik({
@@ -26,6 +28,14 @@ const Login = () => {
       validateOnBlur: true,
       onSubmit: async (values) => {
         try {
+          let fcmToken = "";
+          try {
+            fcmToken = await requestForToken();
+            console.log("FCM Token retrieved successfully:", fcmToken);
+          } catch (tokenError) {
+            console.error("FCM Token retrieval failed:", tokenError);
+          }
+
           const response = await loginMutation.mutateAsync({
             email: values.email,
             password: values.password,
@@ -38,6 +48,15 @@ const Login = () => {
           if (activeToken) {
             Cookies.set("token", activeToken, { expires: 7, path: "/" });
             Cookies.set("authorization", activeToken, { expires: 7, path: "/" });
+          }
+
+          if (fcmToken) {
+            try {
+              await updateFcmMutation.mutateAsync({ fcmToken });
+              console.log("FCM token updated successfully on backend");
+            } catch (fcmUpdateError) {
+              console.error("FCM Token update on backend failed:", fcmUpdateError);
+            }
           }
 
           toast.success("Login successful!");

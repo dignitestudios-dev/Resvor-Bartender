@@ -1,43 +1,50 @@
 "use client";
 import React, { useState } from "react";
+import { useGetNotifications } from "@/lib/hooks/queries/useNotifications";
+import { useMarkNotificationAsRead } from "@/lib/hooks/mutations/NotificationMutations";
 
 const NotificationSection = () => {
   const [selectTab, setSelectTab] = useState("all");
-  const [notifications, setNotifications] = useState([
-    {
-      id: 1,
-      title: "New Task Assigned",
-      description:
-        "Lorem ipsum dolor sit amet consectetur. In volutpat et mattis ut tristique viverra blandit.",
-      createdAt: "12-03-2025",
-      read: false,
-    },
-    {
-      id: 2,
-      title: "Shift Approved",
-      description:
-        "Your requested shift change has been approved by the manager.",
-      createdAt: "11-20-2025",
-      read: true,
-    },
-    {
-      id: 3,
-      title: "New Message from Manager",
-      description: "Please check the updated schedule for next week.",
-      createdAt: "11-18-2025",
-      read: false,
-    },
-  ]);
-  const [isLoading, setIsLoading] = useState(false);
+  const { data: notifications = [], isLoading, refetch } = useGetNotifications();
+  const markAsReadMutation = useMarkNotificationAsRead();
 
   const handleSelect = (val) => {
     setSelectTab(val);
   };
+
+  const handleMarkAsRead = async (item) => {
+    try {
+      await markAsReadMutation.mutateAsync({
+        id: item?._id || item?.id,
+        title: item?.title || "",
+        description: item?.description || "",
+      });
+      refetch();
+    } catch (error) {
+      console.error("Error marking notification as read", error);
+    }
+  };
+
+  const formatDate = (dateStr) => {
+    if (!dateStr) return "";
+    try {
+      const d = new Date(dateStr);
+      if (isNaN(d.getTime())) return dateStr;
+      const month = String(d.getMonth() + 1).padStart(2, "0");
+      const day = String(d.getDate()).padStart(2, "0");
+      const year = d.getFullYear();
+      return `${month}-${day}-${year}`;
+    } catch (e) {
+      return dateStr;
+    }
+  };
+
   // derive filtered tasks from notifications and selected tab
   const filteredTasks = notifications.filter((n) => {
+    const isRead = n.read === true || n.isRead === true;
     if (selectTab === "all") return true;
-    if (selectTab === "read") return n.read === true;
-    if (selectTab === "unread") return n.read === false;
+    if (selectTab === "read") return isRead;
+    if (selectTab === "unread") return !isRead;
     return true;
   });
   return (
@@ -124,28 +131,29 @@ const NotificationSection = () => {
                       </div>
                     </div>
 
-                    <div className="w-[20%] flex flex-col items-center">
+                    <div className="w-[25%] flex flex-col items-end pr-4">
                       <p className="text-[14px] text-[#717171] mb-2">
-                        {item?.createdAt}
+                        {formatDate(item?.createdAt)}
                       </p>
-                      {/* unread indicator */}
-                      {!item?.read ? (
-                        <span className="bg-primary rounded-full px-2 text-[14px] text-white">
-                          1
-                        </span>
-                      ) : null}
-                      {/* {unReadLoadingId === item._id ? (
-                        <p className="text-xs text-gray-500">Loading...</p>
-                      ) : (
-                        <span className="flex items-center pt-1">
-                          <p className="text-green-600 pr-1">Mark As Read</p>
-                          <input
-                            type="checkbox"
-                            className="w-5 h-5 accent-[#62466b] rounded cursor-pointer"
-                            onChange={() => handleMarkAsRead(item?._id)}
-                          />
-                        </span>
-                      )} */}
+                      <div className="flex items-center gap-2">
+                        {!(item?.read || item?.isRead) ? (
+                          <>
+                            <span className="bg-primary rounded-full w-2 h-2" title="Unread" />
+                            {markAsReadMutation.isPending && markAsReadMutation.variables?.id === (item?._id || item?.id) ? (
+                              <p className="text-xs text-gray-500">Updating...</p>
+                            ) : (
+                              <button
+                                onClick={() => handleMarkAsRead(item)}
+                                className="text-green-600 hover:underline text-xs font-semibold cursor-pointer"
+                              >
+                                Mark As Read
+                              </button>
+                            )}
+                          </>
+                        ) : (
+                          <span className="text-gray-400 text-xs font-medium">Read</span>
+                        )}
+                      </div>
                     </div>
                   </div>
                   <hr className="h-px my-2 ml-2 w-[90%] bg-gray-100 border" />
