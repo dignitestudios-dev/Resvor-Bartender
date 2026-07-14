@@ -99,11 +99,10 @@ const Table = ({ startDate, endDate }) => {
               className={`
                   px-3 py-2 text-[16px] transition-all duration-200
                    whitespace-nowrap
-                  ${
-                    activeTab === tab.key
-                      ? " text-blue-950 font-semibold"
-                      : " text-[#727272] hover:text-gray-700 "
-                  }
+                  ${activeTab === tab.key
+                  ? " text-blue-950 font-semibold"
+                  : " text-[#727272] hover:text-gray-700 "
+                }
                 `}
             >
               {tab.label}

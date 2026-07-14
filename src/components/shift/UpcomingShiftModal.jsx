@@ -22,6 +22,7 @@ const UpcomingShiftModal = ({
   const { data: shift, isLoading } = useGetMyShiftById(shiftId, {
     enabled: isOpen && !!shiftId,
   });
+  console.log("🚀 ~ UpcomingShiftModal ~ shift:", shift)
 
   const name = shift?.referenceId?.title || shift?.referenceId?.name || shift?.referenceId || "-";
   const dateStr = shift?.startDateTime ? utils.formatDateWithName(shift.startDateTime) : "-";
