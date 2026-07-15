@@ -20,7 +20,7 @@ const Shifts = () => {
             Track all your time-off and shift swap requests
           </p>
         </div>
-        <div className="flex items-center gap-2">
+        {/* <div className="flex items-center gap-2">
           <Button
             onClick={() => {
               setShiftSwapOpen(false);
@@ -40,7 +40,7 @@ const Shifts = () => {
           >
             Request Shift Swap
           </Button>
-        </div>
+        </div> */}
 
         {/* <div className="flex items-center gap-5">
           <AddShiftAndScheduling isOpen={openForm} onOpenChange={setOpenForm} />

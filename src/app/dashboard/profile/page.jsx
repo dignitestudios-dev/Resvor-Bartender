@@ -34,7 +34,7 @@ const Profile = () => {
   const initials = getInitials(name);
 
   return (
-    <div className="bg-[#FFFFFF] rounded-[16px] p-6 space-y-4">
+    <div className="bg-[#FFFFFF] rounded-[16px] p-6 space-y-4 mt-6">
       <div className="grid grid-cols-2">
         <div className="space-y-4">
           <div className="flex justify-between items-center">

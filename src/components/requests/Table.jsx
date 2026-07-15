@@ -16,6 +16,7 @@ const Table = () => {
   });
 
   const shifts = requestsResponse?.data || [];
+  console.log("🚀 ~ Table ~ shifts:", shifts)
   const totalPages = requestsResponse?.pagination?.totalPages || 1;
 
   const getStatusColor = (status) => {
@@ -123,11 +124,10 @@ const Table = () => {
               className={`
                   px-3 py-2 text-[16px] transition-all duration-200
                    whitespace-nowrap
-                  ${
-                    activeTab === tab.key
-                      ? " text-blue-950 font-[600]"
-                      : " text-[#727272] hover:text-gray-700 "
-                  }
+                  ${activeTab === tab.key
+                  ? " text-blue-950 font-[600]"
+                  : " text-[#727272] hover:text-gray-700 "
+                }
                 `}
             >
               {tab.label}

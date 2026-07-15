@@ -30,16 +30,11 @@ const Table = ({ startDate, endDate }) => {
   const totalPages = shiftsResponse?.pagination?.totalPages || 1;
 
   const getStatusColor = (status) => {
-    switch (status?.toLowerCase()) {
-      case "pending":
-        return "text-[#FFAE10]"; // orange
-      case "unfilled":
-        return "text-[#DC3545]"; // red
-      case "confirmed":
-        return "text-[#28A745]"; // green
-      default:
-        return "text-gray-500";
+    const lowerStatus = status?.toLowerCase();
+    if (lowerStatus === "published" || lowerStatus === "upcoming") {
+      return "text-[#28A745]"; // Green
     }
+    return "text-gray-500"; // Gray
   };
 
   const onPageChange = (newPage) => {
@@ -90,7 +85,7 @@ const Table = ({ startDate, endDate }) => {
       onPageChange={onPageChange}
       totalPages={totalPages}
     >
-      <div className="bg-white rounded-xl overflow-y-auto">
+      <div className="bg-white rounded-xl overflow-x-auto">
         <nav className="flex flex-wrap gap-1 md:gap-2 mx-3">
           {tabs.map((tab) => (
             <button
@@ -109,55 +104,72 @@ const Table = ({ startDate, endDate }) => {
             </button>
           ))}
         </nav>
-        <table className="w-full text-[14px]">
+        <table className="w-full table-fixed min-w-[900px] text-[14px]">
           <thead className="sticky top-0 z-10">
             <tr className="bg-[#E8E8FF] font-medium">
-              <th className="px-8 py-5 text-left text-[#202224] text-nowrap">
+              <th className="w-[14.28%] px-4 py-5 text-left text-[#202224] text-nowrap">
                 Date
               </th>
-              <th className="px-6 py-5 text-left text-[#202224] text-nowrap">
+              <th className="w-[14.28%] px-4 py-5 text-left text-[#202224] text-nowrap">
                 Time
               </th>
-              <th className="px-8 py-5 text-left text-[#202224] text-nowrap">
+              <th className="w-[14.28%] px-4 py-5 text-left text-[#202224] text-nowrap">
                 Role
               </th>
-              <th className="px-6 py-5 text-left text-[#202224] text-nowrap">
+              <th className="w-[14.28%] px-4 py-5 text-left text-[#202224] text-nowrap">
                 Event
               </th>
-              <th className="px-8 py-5 text-left text-[#202224] text-nowrap">
+              <th className="w-[14.28%] px-4 py-5 text-left text-[#202224] text-nowrap">
                 Notes
               </th>
-              <th className="px-8 py-5 text-left text-[#202224] text-nowrap">
+              <th className="w-[14.28%] px-4 py-5 text-left text-[#202224] text-nowrap">
                 Status
               </th>
-              <th className="px-8 py-5 text-center text-nowrap">Action</th>
+              <th className="w-[14.28%] px-4 py-5 text-center text-nowrap">
+                Action
+              </th>
             </tr>
           </thead>
           <tbody>
             {filteredShifts.length > 0 ? (
-              filteredShifts.map((shift, index) => (
-                <tr key={index} className="border-b border-[#D4D4D4]">
-                  <td className="px-8 py-5">{shift.date}</td>
-                  <td className="px-6 py-5">{shift.time}</td>
-                  <td className="px-8 py-5">{shift.type}</td>
-                  <td className="px-6 py-5">{shift.reason}</td>
-                  <td className="px-8 py-5">{shift.submitted}</td>
-                  <td className={`px-8 py-5 ${getStatusColor(shift.status)}`}>
-                    {shift.status}
-                  </td>
-                  <td className="px-8 py-5">
-                    <div
-                      onClick={() => {
-                        setSelectedShiftId(shift._id);
-                        setShiftModal(true);
-                      }}
-                      className="flex justify-center items-center cursor-pointer"
-                    >
-                      <IoIosArrowForward size={20} />
-                    </div>
-                  </td>
-                </tr>
-              ))
+              filteredShifts.map((shift, index) => {
+                const displayStatus = shift.status?.toLowerCase() === "published" ? "Upcoming" : "Completed";
+                return (
+                  <tr key={index} className="border-b border-[#D4D4D4]">
+                    <td className="px-4 py-5 truncate" title={shift.date}>
+                      {shift.date}
+                    </td>
+                    <td className="px-4 py-5 truncate" title={shift.time}>
+                      {shift.time}
+                    </td>
+                    <td className="px-4 py-5 truncate" title={shift.type}>
+                      {shift.type}
+                    </td>
+                    <td className="px-4 py-5 truncate" title={shift.reason}>
+                      {shift.reason}
+                    </td>
+                    <td className="px-4 py-5">
+                      <div className="truncate" title={shift.submitted}>
+                        {shift.submitted}
+                      </div>
+                    </td>
+                    <td className={`px-4 py-5 truncate ${getStatusColor(shift.status)}`} title={displayStatus}>
+                      {displayStatus}
+                    </td>
+                    <td className="px-4 py-5">
+                      <div
+                        onClick={() => {
+                          setSelectedShiftId(shift._id);
+                          setShiftModal(true);
+                        }}
+                        className="flex justify-center items-center cursor-pointer"
+                      >
+                        <IoIosArrowForward size={20} />
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })
             ) : (
               <tr>
                 <td colSpan={7} className="py-8 text-center text-gray-500">
