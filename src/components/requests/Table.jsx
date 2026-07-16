@@ -57,6 +57,7 @@ const Table = () => {
 
     let dateLabel = "-";
     let timeLabel = "-";
+    const submittedDateLabel = req.createdAt ? utils.formatDateWithName(req.createdAt) : "-";
 
     if (isTimeOff) {
       const start = req.startDate ? utils.formatDateWithName(req.startDate) : "";
@@ -100,6 +101,7 @@ const Table = () => {
 
     return {
       _id: req._id,
+      submittedDateLabel,
       date: dateLabel,
       time: timeLabel,
       type: typeLabel,
@@ -155,7 +157,7 @@ const Table = () => {
                   <td className="px-6 py-5">{shift.time}</td>
                   <td className="px-8 py-5">{shift.type}</td>
                   <td className="px-6 py-5">{shift.reason}</td>
-                  <td className="px-8 py-5">{shift.submitted}</td>
+                  <td className="px-8 py-5">{shift.submittedDateLabel}</td>
                   <td className={`px-8 py-5 ${getStatusColor(shift.status)}`}>
                     {utils.capitalize(shift.status)}
                   </td>
