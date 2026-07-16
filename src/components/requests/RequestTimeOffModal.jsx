@@ -83,6 +83,7 @@ const RequestTimeOffModal = ({ isOpen, onOpenChange, setSuccessModal, defaultDat
             </p>
             <textarea
               value={reason}
+              maxLength={250}
               onChange={(e) => setReason(e.target.value)}
               placeholder="Please Provide a reason for your shift swap request...."
               className="w-full min-h-[96px] border rounded-md p-3 text-sm text-[#4B5563]"
