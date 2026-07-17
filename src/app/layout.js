@@ -1,6 +1,7 @@
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
+import OfflineStatusDetector from "@/components/global/OfflineStatusDetector";
 
 import ReactQueryProvider from "@/lib/hooks/query/ReactQueryProvider";
 
@@ -27,6 +28,7 @@ export default function RootLayout({ children }) {
           {children}
         </ReactQueryProvider>
         <Toaster />
+        <OfflineStatusDetector />
       </body>
     </html>
   );
