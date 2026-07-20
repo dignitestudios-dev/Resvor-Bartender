@@ -17,17 +17,22 @@ const RequestStatusCard = ({
     Rejected: "#DC1D00",
   };
 
-  const bgColor = statusColors[status] || statusColors.Pending;
-  const textColor = statusTexts[status] || statusColors.Pending;
+  const formattedStatus =
+    status && typeof status === "string"
+      ? status.charAt(0).toUpperCase() + status.slice(1).toLowerCase()
+      : "Pending";
+
+  const bgColor = statusColors[formattedStatus] || statusColors.Pending;
+  const textColor = statusTexts[formattedStatus] || statusTexts.Pending;
   return (
     <div className="p-4 rounded-[18px] border-[1px] border-[#b9b9b950] bg-white">
       <div className="flex justify-between items-center">
         <p className="text-[20px] font-semibold">{title}</p>
         <div
-          className="text-white text-[14px] rounded-4xl px-3 py-1.5"
+          className="text-white text-[14px] rounded-4xl px-3 py-1.5 font-medium"
           style={{ backgroundColor: bgColor, color: textColor }}
         >
-          {status}
+          {formattedStatus}
         </div>
       </div>
       <div>
