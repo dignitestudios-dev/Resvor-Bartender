@@ -5,7 +5,7 @@ export const useGetNotifications = (options = {}) => {
   return useQuery({
     queryKey: ["notifications"],
     queryFn: fetchNotifications,
-    refetchOnWindowFocus: true,
+    refetchOnWindowFocus: false,
     ...options,
   });
 };

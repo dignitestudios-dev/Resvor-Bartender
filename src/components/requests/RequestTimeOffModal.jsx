@@ -73,6 +73,7 @@ const RequestTimeOffModal = ({ isOpen, onOpenChange, setSuccessModal, defaultDat
               label="Select Date"
               value={date}
               onChange={setDate}
+              minDate={new Date()}
             />
           </div>
 

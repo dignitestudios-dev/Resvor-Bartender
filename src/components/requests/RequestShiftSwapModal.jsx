@@ -22,6 +22,7 @@ import { useAuthMe } from "@/lib/hooks/queries/useQueries";
 import { useRequestShiftSwap } from "@/lib/hooks/mutations/RequestMutations";
 import { toast } from "@/components/ui/toaster";
 import utils from "@/lib/utils";
+import moment from "moment";
 
 const RequestShiftSwapModal = ({ isOpen, onOpenChange, setSuccessModal, defaultShiftId }) => {
   const [reason, setReason] = useState("");
@@ -37,12 +38,23 @@ const RequestShiftSwapModal = ({ isOpen, onOpenChange, setSuccessModal, defaultS
   }, [isOpen, defaultShiftId]);
 
   const { data: myShiftsRes, isLoading: myShiftsLoading } = useGetMyShifts({ limit: 100 });
-  const { data: targetShiftsRes, isLoading: targetShiftsLoading } = useGetAllShifts({ limit: 100 });
+
+  // Extract date from selected shift and pass to API as ?date=yyyy-mm-dd
+  const myShifts = myShiftsRes?.data || [];
+  const selectedMyShift = myShifts.find((s) => s._id === selectedMyShiftId);
+  const selectedShiftDate = selectedMyShift?.startDateTime
+    ? moment(selectedMyShift.startDateTime).format("YYYY-MM-DD")
+    : "";
+
+  const { data: targetShiftsRes, isLoading: targetShiftsLoading } = useGetAllShifts(
+    { limit: 100, date: selectedShiftDate },
+    { enabled: !!selectedShiftDate }
+  );
 
   const { data: currentUser } = useAuthMe();
   const currentUserId = currentUser?._id || currentUser?.id;
 
-  const myShifts = myShiftsRes?.data || [];
+  // myShifts already declared above
 
   const getBartenderName = (bartender) => {
     if (!bartender) return "";

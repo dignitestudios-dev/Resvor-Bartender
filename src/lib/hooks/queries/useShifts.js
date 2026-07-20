@@ -39,11 +39,12 @@ export const useGetMyShiftById = (id, options = {}) => {
 };
 
 // Fetch all shifts
-const fetchAllShifts = async ({ page = 1, limit = 100, bartenderId = "", startDate = "", endDate = "" } = {}) => {
+const fetchAllShifts = async ({ page = 1, limit = 100, bartenderId = "", startDate = "", endDate = "", date = "" } = {}) => {
   const params = { page, limit };
   if (bartenderId) params.bartenderId = bartenderId;
   if (startDate) params.startDate = startDate;
   if (endDate) params.endDate = endDate;
+  if (date) params.date = date;
 
   const { data } = await axios.get("/shifts", { params });
   return {

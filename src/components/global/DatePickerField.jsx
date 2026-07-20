@@ -49,6 +49,19 @@ const DatePickerField = ({
             }}
             fromDate={minDate}
             toDate={maxDate}
+            disabled={(day) => {
+              if (minDate) {
+                const min = new Date(minDate);
+                min.setHours(0, 0, 0, 0);
+                if (day < min) return true;
+              }
+              if (maxDate) {
+                const max = new Date(maxDate);
+                max.setHours(23, 59, 59, 999);
+                if (day > max) return true;
+              }
+              return false;
+            }}
             initialFocus
           />
         </PopoverContent>
