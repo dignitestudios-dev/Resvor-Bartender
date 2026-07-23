@@ -2,10 +2,11 @@ import { useQuery } from "@tanstack/react-query";
 import axios from "../../../axios";
 
 // Fetch bartender's shifts
-const fetchMyShifts = async ({ page = 1, limit = 10, startDate = "", endDate = "" } = {}) => {
+const fetchMyShifts = async ({ page = 1, limit = 10, startDate = "", endDate = "", status = "" } = {}) => {
   const params = { page, limit };
   if (startDate) params.startDate = startDate;
   if (endDate) params.endDate = endDate;
+  if (status && status !== "all") params.timing = status;
 
   const { data } = await axios.get("/shifts/my", { params });
   return {
