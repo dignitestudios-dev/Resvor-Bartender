@@ -4,8 +4,8 @@ import Cookies from "js-cookie";
 import { ErrorToast } from "./components/ui/toaster";
 
 // Proxy configuration - similar to Vite setup
-// export const baseUrl = "https://api-dev.resvor.com";
-export const baseUrl = "https://api-staging.resvor.com";
+export const baseUrl = "https://api-dev.resvor.com";
+// export const baseUrl = "https://api-staging.resvor.com";
 
 
 async function getDeviceFingerprint() {
@@ -15,7 +15,7 @@ async function getDeviceFingerprint() {
     try {
         const fp = await FingerprintJS.load();
         const result = await fp.get();
-        console.log(result.visitorId); // Unique device ID
+
         return result.visitorId;
     } catch (e) {
         console.log("Fingerprint failed", e);
@@ -84,11 +84,6 @@ instance.interceptors.request.use(async (request) => {
 
 instance.interceptors.response.use(
     (response) => {
-        console.log("✅ Response received:", response.config.url, {
-            status: response.status,
-            headers: response.headers,
-            data: response.data,
-        });
 
         const token =
             response.data?.token ||
@@ -114,10 +109,7 @@ instance.interceptors.response.use(
         return response;
     },
     (error) => {
-        console.error("❌ Request error:", error.config?.url, {
-            status: error.response?.status,
-            message: error.message,
-        });
+
 
         if (error.response?.data) {
             const data = error.response.data;
