@@ -16,38 +16,53 @@ const Table = ({ startDate, endDate }) => {
   const [successModal, setSuccessModal] = useState(false);
   const [selectedShiftId, setSelectedShiftId] = useState(null);
 
+  const [activeTab, setActiveTab] = useState("all");
   const [page, setPage] = useState(1);
   const LIMIT = 10;
 
-  const { data: shiftsResponse, isLoading } = useGetMyShifts({
-    page,
-    limit: LIMIT,
-    startDate: startDate || "",
-    endDate: endDate || "",
-  });
-
-  const shifts = shiftsResponse?.data || [];
-  const totalPages = shiftsResponse?.pagination?.totalPages || 1;
-
-  const getStatusColor = (status) => {
-    const lowerStatus = status?.toLowerCase();
-    if (lowerStatus === "published" || lowerStatus === "upcoming") {
-      return "text-[#28A745]"; // Green
-    }
-    return "text-gray-500"; // Gray
+  const handleTabChange = (tabKey) => {
+    setActiveTab(tabKey);
+    setPage(1);
   };
-
-  const onPageChange = (newPage) => {
-    setPage(newPage);
-  };
-
-  const [activeTab, setActiveTab] = useState("all");
 
   const tabs = [
     { key: "all", label: "All" },
     { key: "upcoming", label: "Upcoming" },
     { key: "past", label: "Past" },
   ];
+
+  const { data: shiftsResponse, isLoading } = useGetMyShifts({
+    page,
+    limit: LIMIT,
+    startDate: startDate || "",
+    endDate: endDate || "",
+    status: activeTab === "all" ? "" : activeTab,
+  });
+
+  const shifts = shiftsResponse?.data || [];
+  const totalPages = shiftsResponse?.pagination?.totalPages || 1;
+
+  const getStatusColor = (status) => {
+    switch (status?.toLowerCase()) {
+      case "published":
+      case "upcoming":
+      case "completed":
+      case "approved":
+      case "confirmed":
+        return "text-[#28A745]"; // Green
+      case "pending":
+        return "text-[#FFAE10]"; // Orange
+      case "rejected":
+      case "cancelled":
+        return "text-[#DC3545]"; // Red
+      default:
+        return "text-gray-500"; // Gray
+    }
+  };
+
+  const onPageChange = (newPage) => {
+    setPage(newPage);
+  };
 
   // Map API response to visually normalized shifts
   const normalizedShifts = shifts.map((shift) => {
@@ -65,20 +80,6 @@ const Table = ({ startDate, endDate }) => {
     };
   });
 
-  // Client-side filtering for activeTab (Upcoming/Past/All)
-  const filteredShifts = normalizedShifts.filter((s) => {
-    if (!s.startDateTime) return true;
-    const shiftDate = new Date(s.startDateTime);
-    const now = new Date();
-    if (activeTab === "upcoming") {
-      return shiftDate >= now;
-    }
-    if (activeTab === "past") {
-      return shiftDate < now;
-    }
-    return true;
-  });
-
   return (
     <CustomPagination
       loading={isLoading}
@@ -90,7 +91,7 @@ const Table = ({ startDate, endDate }) => {
           {tabs.map((tab) => (
             <button
               key={tab.key}
-              onClick={() => setActiveTab(tab.key)}
+              onClick={() => handleTabChange(tab.key)}
               className={`
                   px-3 py-2 text-[16px] transition-all duration-200
                    whitespace-nowrap
@@ -131,11 +132,11 @@ const Table = ({ startDate, endDate }) => {
             </tr>
           </thead>
           <tbody>
-            {filteredShifts.length > 0 ? (
-              filteredShifts.map((shift, index) => {
-                const displayStatus = shift.status?.toLowerCase() === "published" ? "Upcoming" : "Completed";
+            {normalizedShifts.length > 0 ? (
+              normalizedShifts.map((shift, index) => {
+                const displayStatus = shift.status ? utils.capitalize(shift.status) : "-";
                 return (
-                  <tr key={index} className="border-b border-[#D4D4D4]">
+                  <tr key={shift._id || index} className="border-b border-[#D4D4D4]">
                     <td className="px-4 py-5 truncate" title={shift.date}>
                       {shift.date}
                     </td>

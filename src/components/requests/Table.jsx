@@ -156,7 +156,7 @@ const Table = () => {
                   </td>
                   <td className="px-6 py-5">{shift.time}</td>
                   <td className="px-8 py-5">{shift.type}</td>
-                  <td className="px-6 py-5">{shift.reason}</td>
+                  <td className="px-6 py-5 max-w-[450px] break-all">{shift.reason}</td>
                   <td className="px-8 py-5">{shift.submittedDateLabel}</td>
                   <td className={`px-8 py-5 ${getStatusColor(shift.status)}`}>
                     {utils.capitalize(shift.status)}
