@@ -1,9 +1,11 @@
 "use client";
 import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 import { useGetNotifications } from "@/lib/hooks/queries/useNotifications";
 import { useMarkNotificationAsRead } from "@/lib/hooks/mutations/NotificationMutations";
 
 const NotificationSection = () => {
+  const router = useRouter();
   const [selectTab, setSelectTab] = useState("all");
   const { data: notifications = [], isLoading, refetch } = useGetNotifications();
   const markAsReadMutation = useMarkNotificationAsRead();
@@ -12,7 +14,8 @@ const NotificationSection = () => {
     setSelectTab(val);
   };
 
-  const handleMarkAsRead = async (item) => {
+  const handleMarkAsRead = async (e, item) => {
+    e.stopPropagation();
     try {
       await markAsReadMutation.mutateAsync({
         id: item?._id || item?.id,
@@ -22,6 +25,16 @@ const NotificationSection = () => {
       refetch();
     } catch (error) {
       console.error("Error marking notification as read", error);
+    }
+  };
+
+  const handleItemClick = (item) => {
+    const resourceType = item?.metadata?.resourceType || item?.resourceType;
+
+    if (resourceType === "TimeOffRequest") {
+      router.push("/dashboard/requests");
+    } else if (resourceType === "Shift") {
+      router.push("/dashboard/shift");
     }
   };
 
@@ -53,31 +66,28 @@ const NotificationSection = () => {
         <div className="flex justify-start items-center gap-4 mx-6 pb-2">
           <button
             onClick={() => handleSelect("all")}
-            className={` ${
-              selectTab === "all"
-                ? "text-indigo-950 font-bold"
-                : "text-gray-500"
-            }`}
+            className={` ${selectTab === "all"
+              ? "text-indigo-950 font-bold"
+              : "text-gray-500"
+              }`}
           >
             All
           </button>
           <button
             onClick={() => handleSelect("read")}
-            className={` ${
-              selectTab === "read"
-                ? "text-indigo-950 font-bold"
-                : "text-gray-500"
-            } `}
+            className={` ${selectTab === "read"
+              ? "text-indigo-950 font-bold"
+              : "text-gray-500"
+              } `}
           >
             Read
           </button>
           <button
             onClick={() => handleSelect("unread")}
-            className={` ${
-              selectTab === "unread"
-                ? "text-indigo-950 font-bold"
-                : "text-gray-500"
-            } `}
+            className={` ${selectTab === "unread"
+              ? "text-indigo-950 font-bold"
+              : "text-gray-500"
+              } `}
           >
             Unread
           </button>
@@ -110,9 +120,13 @@ const NotificationSection = () => {
           {filteredTasks?.length > 0 ? (
             <div className=" h-[430px] overflow-y-auto ">
               {filteredTasks?.map((item, index) => (
-                <div className="pl-8" key={index}>
+                <div
+                  className="pl-8 cursor-pointer hover:bg-gray-50 transition-colors"
+                  key={item?._id || item?.id || index}
+                  onClick={() => handleItemClick(item)}
+                >
                   <div className="flex justify-between items-center py-2 w-[95%] border-gray-100">
-                    <div className="bg-white flex w-[95%]">
+                    <div className="flex w-[95%]">
                       {/* <div className="py-3 px-2 mt-1">
                   <img
                     src={task.image}
@@ -143,7 +157,7 @@ const NotificationSection = () => {
                               <p className="text-xs text-gray-500">Updating...</p>
                             ) : (
                               <button
-                                onClick={() => handleMarkAsRead(item)}
+                                onClick={(e) => handleMarkAsRead(e, item)}
                                 className="text-green-600 hover:underline text-xs font-semibold cursor-pointer"
                               >
                                 Mark As Read
