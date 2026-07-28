@@ -333,11 +333,11 @@ export default function ChatUI() {
         {/* ── Chat Area ── */}
         <div className="flex-1 flex flex-col min-h-0">
           {/* Chat Header */}
-          <div className="bg-white border-b border-gray-200 px-5 py-4 flex items-center gap-3 flex-shrink-0">
+          <div className="bg-white border-b border-gray-200 px-5 py-4 flex items-center gap-3 flex-shrink-0 min-w-0">
             <Avatar participant={otherParticipant} size="md" />
-            <div>
-              <h2 className="text-base font-semibold text-gray-900 leading-tight">{managerName}</h2>
-              <p className="text-xs text-gray-400">Lounge Manager</p>
+            <div className="min-w-0 flex-1">
+              <h2 className="text-base font-semibold text-gray-900 leading-tight truncate">{managerName}</h2>
+              <p className="text-xs text-gray-400 truncate">Lounge Manager</p>
             </div>
           </div>
 
@@ -386,11 +386,11 @@ export default function ChatUI() {
                       className={`flex items-end gap-2 ${isOwn ? "justify-end" : "justify-start"} ${item._optimistic ? "opacity-70" : ""}`}
                     >
                       {!isOwn && (
-                        <Avatar participant={otherParticipant} size="sm" className="mb-1" />
+                        <Avatar participant={otherParticipant} size="sm" className="mb-1 flex-shrink-0" />
                       )}
 
                       <div
-                        className={`max-w-[65%] rounded-2xl px-4 py-2.5 ${isOwn
+                        className={`max-w-[85%] sm:max-w-[75%] md:max-w-[65%] min-w-0 rounded-2xl px-4 py-2.5 break-words [overflow-wrap:anywhere] ${isOwn
                           ? "bg-gradient-to-br from-[#010067] to-black text-white rounded-br-sm"
                           : "bg-white text-gray-900 rounded-bl-sm shadow-sm border border-gray-100"
                           }`}
@@ -406,7 +406,7 @@ export default function ChatUI() {
 
                         {/* Text */}
                         {item.payload?.text && (
-                          <p className="text-sm leading-relaxed whitespace-pre-wrap">
+                          <p className="text-sm leading-relaxed whitespace-pre-wrap break-words [overflow-wrap:anywhere] [word-break:break-word]">
                             {item.payload.text}
                           </p>
                         )}
