@@ -104,7 +104,7 @@ const Dashboard = () => {
               })
             ) : (
               <div className="col-span-1 md:col-span-3 text-center py-6 text-gray-500 font-medium">
-                No upcoming shifts assigned.
+                No Upcoming Shifts Assigned.
               </div>
             )}
           </div>
@@ -144,7 +144,7 @@ const Dashboard = () => {
               })
             ) : (
               <div className="col-span-1 md:col-span-3 text-center py-6 text-gray-500 font-medium">
-                No recent requests found.
+                No Recent Requests Found.
               </div>
             )}
           </div>
