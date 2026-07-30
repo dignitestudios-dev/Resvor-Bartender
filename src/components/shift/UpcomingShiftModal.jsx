@@ -22,9 +22,8 @@ const UpcomingShiftModal = ({
   const { data: shift, isLoading } = useGetMyShiftById(shiftId, {
     enabled: isOpen && !!shiftId,
   });
-  console.log("🚀 ~ UpcomingShiftModal ~ shift:", shift)
 
-  const name = shift?.referenceId?.title || shift?.referenceId?.name || shift?.referenceId || "-";
+  const name = shift?.referenceId?.title || "Not Assigned";
   const dateStr = shift?.startDateTime ? utils.formatDateWithName(shift.startDateTime) : "-";
   const startTimeStr = shift?.startDateTime ? utils.formatTime12(shift.startDateTime) : "";
   const endTimeStr = shift?.endDateTime ? utils.formatTime12(shift.endDateTime) : "";
@@ -79,7 +78,7 @@ const UpcomingShiftModal = ({
                 Event
               </p>
               <p className="text-[14px] text-[#737373]">
-                {name}
+                {name || "Not Assigned"}
               </p>
             </div>
 
@@ -102,29 +101,30 @@ const UpcomingShiftModal = ({
         )}
 
         <DialogFooter>
-          <div className="flex justify-center gap-4 w-full">
-            <Button
-              onClick={() => {
-                onOpenChange(false);
-                setTimeOffOpen(true);
-              }}
-              className={" py-3 px-4 font-medium "}
-              disabled={isLoading}
-            >
-              Request Time Off
-            </Button>
+          {shift?.status === "published" &&
+            <div className="flex justify-center gap-4 w-full">
+              <Button
+                onClick={() => {
+                  onOpenChange(false);
+                  setTimeOffOpen(true);
+                }}
+                className={" py-3 px-4 font-medium "}
+                disabled={isLoading}
+              >
+                Request Time Off
+              </Button>
 
-            <Button
-              onClick={() => {
-                onOpenChange(false);
-                setShiftSwapOpen(true);
-              }}
-              className={" py-3 px-4 font-medium "}
-              disabled={isLoading}
-            >
-              Request Shift Swap
-            </Button>
-          </div>
+              <Button
+                onClick={() => {
+                  onOpenChange(false);
+                  setShiftSwapOpen(true);
+                }}
+                className={" py-3 px-4 font-medium "}
+                disabled={isLoading}
+              >
+                Request Shift Swap
+              </Button>
+            </div>}
         </DialogFooter>
       </DialogContent>
     </Dialog>

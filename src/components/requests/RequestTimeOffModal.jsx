@@ -7,7 +7,6 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import DatePickerField from "../global/DatePickerField";
 import { useRequestTimeOff } from "@/lib/hooks/mutations/RequestMutations";
 import { toast } from "@/components/ui/toaster";
 import moment from "moment";
@@ -18,7 +17,7 @@ const RequestTimeOffModal = ({ isOpen, onOpenChange, setSuccessModal, defaultDat
 
   useEffect(() => {
     if (isOpen) {
-      setDate(defaultDate ? new Date(defaultDate) : null);
+      setDate(defaultDate ? new Date(defaultDate) : new Date());
       setReason("");
     }
   }, [isOpen, defaultDate]);
@@ -27,7 +26,7 @@ const RequestTimeOffModal = ({ isOpen, onOpenChange, setSuccessModal, defaultDat
 
   const handleSubmit = () => {
     if (!date) {
-      toast.error("Please select a date.");
+      toast.error("Date is required.");
       return;
     }
     if (!reason.trim()) {
@@ -68,13 +67,12 @@ const RequestTimeOffModal = ({ isOpen, onOpenChange, setSuccessModal, defaultDat
 
         <div className="pt-1">
           <div className="mb-4">
-            <DatePickerField
-              labelText="Select Date"
-              label="Select Date"
-              value={date}
-              onChange={setDate}
-              minDate={new Date()}
-            />
+            <p className="text-[14px] font-semibold text-[#181818] mb-2">
+              Date
+            </p>
+            <div className="w-full border rounded-md p-3 text-sm text-[#4B5563] bg-gray-50 font-medium">
+              {date ? moment(date).format("DD MMM, YYYY") : "-"}
+            </div>
           </div>
 
           <div className="mb-2">
@@ -113,4 +111,5 @@ const RequestTimeOffModal = ({ isOpen, onOpenChange, setSuccessModal, defaultDat
 };
 
 export default RequestTimeOffModal;
+
 

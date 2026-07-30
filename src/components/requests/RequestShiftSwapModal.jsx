@@ -17,9 +17,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import DatePickerField from "../global/DatePickerField";
-import { useGetMyShifts, useGetAllShifts } from "@/lib/hooks/queries/useShifts";
-import { useAuthMe } from "@/lib/hooks/queries/useQueries";
+import { useGetMyShifts, useGetSwappableShifts } from "@/lib/hooks/queries/useShifts";
 import { useRequestShiftSwap } from "@/lib/hooks/mutations/RequestMutations";
 import { toast } from "@/components/ui/toaster";
 import utils from "@/lib/utils";
@@ -31,104 +29,61 @@ const RequestShiftSwapModal = ({ isOpen, onOpenChange, setSuccessModal, defaultS
   const [selectedMyShiftId, setSelectedMyShiftId] = useState("");
   const [selectedTargetShiftId, setSelectedTargetShiftId] = useState("");
 
-  const { data: myShiftsRes, isLoading: myShiftsLoading } = useGetMyShifts({ limit: 100 });
+  const reqId = defaultShiftId || selectedMyShiftId;
+
+  const { data: myShiftsRes } = useGetMyShifts({ limit: 100 }, { enabled: isOpen });
   const myShifts = myShiftsRes?.data || [];
+
+  const { data: swappableRes, isLoading: swappableLoading } = useGetSwappableShifts(reqId, {
+    enabled: isOpen && !!reqId,
+  });
+
+  const availableShifts = Array.isArray(swappableRes)
+    ? swappableRes
+    : swappableRes?.data || [];
 
   useEffect(() => {
     if (isOpen) {
       setReason("");
       setSelectedTargetShiftId("");
 
-      if (defaultShiftId && myShifts.length > 0) {
-        const defShift = myShifts.find((s) => s._id === defaultShiftId);
+      const currentReqId = defaultShiftId || selectedMyShiftId;
+      if (currentReqId && myShifts.length > 0) {
+        const defShift = myShifts.find((s) => s._id === currentReqId);
         if (defShift?.startDateTime) {
           const defDate = new Date(defShift.startDateTime);
           if (moment(defDate).isBefore(moment(), "day")) {
-            toast.error("Past shifts cannot be swapped. Please select today or a future date.");
+            toast.error("Past shifts cannot be swapped.");
             setSelectedDate(new Date());
             setSelectedMyShiftId("");
           } else {
             setSelectedDate(defDate);
-            setSelectedMyShiftId(defaultShiftId);
+            setSelectedMyShiftId(currentReqId);
           }
         } else {
           setSelectedDate(new Date());
-          setSelectedMyShiftId(defaultShiftId);
+          setSelectedMyShiftId(currentReqId);
         }
-      } else if (!defaultShiftId) {
+      } else if (!currentReqId) {
         setSelectedDate(new Date());
         setSelectedMyShiftId("");
       }
     }
-  }, [isOpen, defaultShiftId]);
-
-  useEffect(() => {
-    if (isOpen && defaultShiftId && myShifts.length > 0 && !selectedMyShiftId) {
-      const defShift = myShifts.find((s) => s._id === defaultShiftId);
-      if (defShift?.startDateTime) {
-        const defDate = new Date(defShift.startDateTime);
-        if (!moment(defDate).isBefore(moment(), "day")) {
-          setSelectedDate(defDate);
-          setSelectedMyShiftId(defaultShiftId);
-        }
-      }
-    }
   }, [isOpen, defaultShiftId, myShifts]);
 
-  const handleDateChange = (newDate) => {
-    if (!newDate) return;
-    if (moment(newDate).isBefore(moment(), "day")) {
-      toast.error("Past dates are not allowed. Please select today or a future date.");
-      return;
-    }
-    setSelectedDate(newDate);
-    setSelectedMyShiftId("");
-    setSelectedTargetShiftId("");
-  };
-
-  const formattedSelectedDate = selectedDate
-    ? moment(selectedDate).format("YYYY-MM-DD")
-    : moment().format("YYYY-MM-DD");
-
-  // Display only shifts scheduled for the selected date (excluding past dates)
-  const myShiftsForSelectedDate = myShifts.filter((shift) => {
-    if (!shift?.startDateTime) return false;
-    const shiftDate = moment(shift.startDateTime).format("YYYY-MM-DD");
-    const isPast = moment(shift.startDateTime).isBefore(moment(), "day");
-    return shiftDate === formattedSelectedDate && !isPast;
-  });
-
-  const selectedMyShift = myShifts.find((s) => s._id === selectedMyShiftId);
-
-  const { data: targetShiftsRes, isLoading: targetShiftsLoading } = useGetAllShifts(
-    { limit: 100, date: formattedSelectedDate },
-    { enabled: !!formattedSelectedDate }
-  );
-
-  const { data: currentUser } = useAuthMe();
-  const currentUserId = currentUser?._id || currentUser?.id;
+  const { mutate: submitShiftSwap, isPending } = useRequestShiftSwap();
 
   const getBartenderName = (bartender) => {
     if (!bartender) return "";
     if (typeof bartender === "string") return "";
-    return bartender.fullName || `${bartender.firstName || ""} ${bartender.lastName || ""}`.trim() || bartender.name || bartender.email || "";
-  };
-
-  const targetShifts = (targetShiftsRes?.data || []).filter((shift) => {
-    if (!shift?.startDateTime) return false;
-    const shiftDate = moment(shift.startDateTime).format("YYYY-MM-DD");
-    const isPast = moment(shift.startDateTime).isBefore(moment(), "day");
-    const bartender = shift.bartenderIds?.[0] || shift.bartenderId;
-    const bId = bartender && typeof bartender === "object" ? bartender._id : bartender;
     return (
-      shiftDate === formattedSelectedDate &&
-      !isPast &&
-      bId !== currentUserId &&
-      shift._id !== selectedMyShiftId
+      bartender.fullName ||
+      `${bartender.firstName || ""} ${bartender.lastName || ""}`.trim() ||
+      bartender.name ||
+      bartender.email ||
+      ""
     );
-  });
-
-  const { mutate: submitShiftSwap, isPending } = useRequestShiftSwap();
+  };
 
   const formatShiftLabel = (shift) => {
     const startStr = utils.formatTime12(shift.startDateTime);
@@ -140,25 +95,13 @@ const RequestShiftSwapModal = ({ isOpen, onOpenChange, setSuccessModal, defaultS
   };
 
   const handleSubmit = () => {
-    if (!selectedDate || moment(selectedDate).isBefore(moment(), "day")) {
-      toast.error("Please select today or a future date.");
-      return;
-    }
-    if (!selectedMyShiftId) {
-      toast.error("Please select one of your shifts to swap.");
-      return;
-    }
-    if (selectedMyShift && moment(selectedMyShift.startDateTime).isBefore(moment(), "day")) {
-      toast.error("Cannot swap past shifts. Please select today or a future shift.");
+    const requestorShiftId = defaultShiftId || selectedMyShiftId;
+    if (!requestorShiftId) {
+      toast.error("No shift selected for request.");
       return;
     }
     if (!selectedTargetShiftId) {
-      toast.error("Please select the target shift to swap with.");
-      return;
-    }
-    const selectedTargetShift = targetShifts.find((s) => s._id === selectedTargetShiftId);
-    if (selectedTargetShift && moment(selectedTargetShift.startDateTime).isBefore(moment(), "day")) {
-      toast.error("Target shift is in the past.");
+      toast.error("Please select a target shift to swap with.");
       return;
     }
     if (!reason.trim()) {
@@ -167,7 +110,7 @@ const RequestShiftSwapModal = ({ isOpen, onOpenChange, setSuccessModal, defaultS
     }
 
     const payload = {
-      requestorShiftId: selectedMyShiftId,
+      requestorShiftId,
       targetShiftId: selectedTargetShiftId,
       reason: reason.trim(),
     };
@@ -199,74 +142,37 @@ const RequestShiftSwapModal = ({ isOpen, onOpenChange, setSuccessModal, defaultS
         </DialogHeader>
 
         <div className="flex relative flex-col gap-4 mt-2">
-          {/* Select Date */}
-          <DatePickerField
-            labelText="Select Date"
-            label="Select Date"
-            value={selectedDate}
-            onChange={handleDateChange}
-            minDate={new Date()}
-          />
-
-          {/* Select Your Shift */}
+          {/* Static Date */}
           <div className="flex flex-col gap-1">
             <Label className="text-[14px] text-[#181818] font-[500]">
-              Select Your Shift to Swap
+              Date
             </Label>
-            <Select onValueChange={setSelectedMyShiftId} value={selectedMyShiftId}>
-              <SelectTrigger className="w-full h-10!">
-                <SelectValue placeholder={myShiftsLoading ? "Loading your shifts..." : "Select your shift"} />
-              </SelectTrigger>
-              <SelectContent className="max-h-[200px]">
-                <SelectGroup>
-                  <SelectLabel>Your Shifts</SelectLabel>
-                  {myShiftsForSelectedDate.length > 0 ? (
-                    myShiftsForSelectedDate.map((shift) => (
-                      <SelectItem key={shift._id} value={shift._id}>
-                        {formatShiftLabel(shift)}
-                      </SelectItem>
-                    ))
-                  ) : (
-                    <SelectItem value="none" disabled>
-                      No shifts found for selected date
-                    </SelectItem>
-                  )}
-                </SelectGroup>
-              </SelectContent>
-            </Select>
+            <div className="w-full border rounded-md p-3 text-sm text-[#4B5563] bg-gray-50 font-medium">
+              {selectedDate ? moment(selectedDate).format("DD MMM, YYYY") : "-"}
+            </div>
           </div>
 
-          {/* Select Target Shift */}
+          {/* Select Shift to Swap With (Target Shift) */}
           <div className="flex flex-col gap-1">
             <Label className="text-[14px] text-[#181818] font-[500]">
               Select Shift to Swap With
             </Label>
-            <Select
-              onValueChange={setSelectedTargetShiftId}
-              value={selectedTargetShiftId}
-              disabled={targetShiftsLoading}
-            >
+            <Select onValueChange={setSelectedTargetShiftId} value={selectedTargetShiftId}>
               <SelectTrigger className="w-full h-10!">
-                <SelectValue
-                  placeholder={
-                    targetShiftsLoading
-                      ? "Loading shifts..."
-                      : "Select shift"
-                  }
-                />
+                <SelectValue placeholder={swappableLoading ? "Loading shifts..." : "Select shift"} />
               </SelectTrigger>
               <SelectContent className="max-h-[200px]">
                 <SelectGroup>
                   <SelectLabel>Available Shifts</SelectLabel>
-                  {targetShifts.length > 0 ? (
-                    targetShifts.map((shift) => (
+                  {availableShifts.length > 0 ? (
+                    availableShifts.map((shift) => (
                       <SelectItem key={shift._id} value={shift._id}>
                         {formatShiftLabel(shift)}
                       </SelectItem>
                     ))
                   ) : (
                     <SelectItem value="none" disabled>
-                      No shifts found for selected date
+                      No shifts found
                     </SelectItem>
                   )}
                 </SelectGroup>

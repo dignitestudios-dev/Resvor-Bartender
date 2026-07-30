@@ -62,3 +62,19 @@ export const useGetAllShifts = (params = {}, options = {}) => {
   });
 };
 
+// Fetch swappable shifts for a given shift ID
+const fetchSwappableShifts = async (shiftId) => {
+  const { data } = await axios.get(`/shifts/swappable/${shiftId}`);
+  return data?.data || data || [];
+};
+
+export const useGetSwappableShifts = (shiftId, options = {}) => {
+  return useQuery({
+    queryKey: ["swappable-shifts", shiftId],
+    queryFn: () => fetchSwappableShifts(shiftId),
+    enabled: !!shiftId,
+    ...options,
+  });
+};
+
+

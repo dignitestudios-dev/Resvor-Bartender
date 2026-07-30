@@ -45,18 +45,16 @@ const Table = ({ startDate, endDate }) => {
   const getStatusColor = (status) => {
     switch (status?.toLowerCase()) {
       case "published":
-      case "upcoming":
+      case "publish":
+        return "text-[#0052CC]";
       case "completed":
-      case "approved":
+      case "complete":
       case "confirmed":
-        return "text-[#28A745]"; // Green
-      case "pending":
-        return "text-[#FFAE10]"; // Orange
-      case "rejected":
-      case "cancelled":
-        return "text-[#DC3545]"; // Red
+        return "text-[#28A745]";
+      case "draft":
+        return "text-gray-500";
       default:
-        return "text-gray-500"; // Gray
+        return "text-gray-500";
     }
   };
 
@@ -73,8 +71,8 @@ const Table = ({ startDate, endDate }) => {
       date: utils.formatDateWithName(shift.startDateTime) || "-",
       time: startStr && endStr ? `${startStr} - ${endStr}` : "-",
       type: shift.role || "-",
-      reason: shift.referenceId?.title || shift.referenceId?.name || shift.referenceId || "-",
-      submitted: shift.instructions || "-",
+      reason: shift.referenceId?.title || "Not Assigned",
+      submitted: shift.instructions || "--",
       status: shift.status || "pending",
       startDateTime: shift.startDateTime,
     };
