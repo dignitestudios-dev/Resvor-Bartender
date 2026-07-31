@@ -132,7 +132,8 @@ const Table = ({ startDate, endDate }) => {
           <tbody>
             {normalizedShifts.length > 0 ? (
               normalizedShifts.map((shift, index) => {
-                const displayStatus = shift.status ? utils.capitalize(shift.status) : "-";
+                const displayStatus = utils.getNormalizedStatus(shift.status);
+                const statusColor = utils.getStatusColorHex(shift.status);
                 return (
                   <tr key={shift._id || index} className="border-b border-[#D4D4D4]">
                     <td className="px-4 py-5 truncate" title={shift.date}>
@@ -152,7 +153,7 @@ const Table = ({ startDate, endDate }) => {
                         {shift.submitted}
                       </div>
                     </td>
-                    <td className={`px-4 py-5 truncate ${getStatusColor(shift.status)}`} title={displayStatus}>
+                    <td className="px-4 py-5 truncate font-medium" style={{ color: statusColor }} title={displayStatus}>
                       {displayStatus}
                     </td>
                     <td className="px-4 py-5">

@@ -1,4 +1,4 @@
-import React from "react";
+import utils from "@/lib/utils";
 
 const RequestStatusCard = ({
   title = "Time Off",
@@ -6,24 +6,9 @@ const RequestStatusCard = ({
   submitted = "Submitted 2 days ago",
   status = "Pending",
 }) => {
-  const statusColors = {
-    Pending: "#FFAE101A",
-    Approved: "#20BD4A1A",
-    Rejected: "#DC1D001A",
-  };
-  const statusTexts = {
-    Pending: "#FFAE10",
-    Approved: "#20BD4A",
-    Rejected: "#DC1D00",
-  };
-
-  const formattedStatus =
-    status && typeof status === "string"
-      ? status.charAt(0).toUpperCase() + status.slice(1).toLowerCase()
-      : "Pending";
-
-  const bgColor = statusColors[formattedStatus] || statusColors.Pending;
-  const textColor = statusTexts[formattedStatus] || statusTexts.Pending;
+  const formattedStatus = utils.getNormalizedStatus(status);
+  const textColor = utils.getStatusColorHex(status);
+  const bgColor = `${textColor}1A`;
   return (
     <div className="p-4 rounded-[18px] border-[1px] border-[#b9b9b950] bg-white">
       <div className="flex justify-between items-center">

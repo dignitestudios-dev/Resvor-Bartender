@@ -163,8 +163,11 @@ const Table = () => {
                 <td className="px-4 py-6">
                   {utils.formatCurrency(order?.amount)}
                 </td>
-                <td className={`px-4 py-6 ${getStatusColor(order?.status)}`}>
-                  {utils.capitalize(order?.status)}
+                <td
+                  className="px-4 py-6 font-medium"
+                  style={{ color: utils.getStatusColorHex(order?.status) }}
+                >
+                  {utils.getNormalizedStatus(order?.status)}
                 </td>
                 <td className="px-4 py-6 text-nowrap">
                   <div className="flex justify-center items-center cursor-pointer">

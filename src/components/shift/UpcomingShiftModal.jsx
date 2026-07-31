@@ -35,7 +35,7 @@ const UpcomingShiftModal = ({
         <DialogHeader>
           <div className="flex items-center justify-between w-full border-b-2 ">
             <DialogTitle className="text-[28px] font-bold text-[#181818] pb-2">
-              Upcoming Shift
+              Shift Details
             </DialogTitle>
           </div>
         </DialogHeader>
