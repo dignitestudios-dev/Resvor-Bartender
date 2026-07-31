@@ -38,7 +38,10 @@ const Navbar = () => {
               {initials}
             </div>
           )}
-          <h2 className="text-[13px] font-medium text-gray-900">
+          <h2
+            className="text-[13px] font-medium text-gray-900 truncate max-w-[150px]"
+            title={name}
+          >
             {name}
           </h2>
         </div>

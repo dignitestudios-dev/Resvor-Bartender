@@ -48,7 +48,7 @@ const Profile = () => {
                 className="w-[78px] h-[78px] rounded-full object-cover border border-gray-200"
               />
             ) : (
-              <div className="w-[78px] h-[78px] rounded-full bg-gradient-to-br from-gray-600 to-gray-800 flex items-center justify-center text-white font-semibold">
+              <div className="w-[138px] h-[78px] rounded-full bg-gradient-to-br from-gray-600 to-gray-800 flex items-center justify-center text-white font-semibold">
                 {initials}
               </div>
             )}

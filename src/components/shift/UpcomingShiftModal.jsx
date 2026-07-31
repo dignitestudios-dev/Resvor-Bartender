@@ -45,27 +45,36 @@ const UpcomingShiftModal = ({
             <Loader2 className="animate-spin text-blue-950" size={36} />
           </div>
         ) : shift ? (
-          <div className="">
+          <div>
             <h4 className="text-[16px] text-[#181818] font-semibold mb-3">
               Shift Details
             </h4>
 
             <div className="grid grid-cols-3 gap-4 mb-4">
-              <div>
+              <div className="min-w-0">
                 <p className="text-[14px] font-medium text-[#737373]">Date</p>
-                <p className="text-[14px] font-semibold text-[#181818] mt-1">
+                <p
+                  className="text-[14px] font-semibold text-[#181818] mt-1 break-all whitespace-pre-wrap"
+                  style={{ wordBreak: "break-all", overflowWrap: "anywhere" }}
+                >
                   {dateStr}
                 </p>
               </div>
-              <div>
+              <div className="min-w-0">
                 <p className="text-[14px] font-medium text-[#737373]">Time</p>
-                <p className="text-[14px] font-semibold text-[#181818] mt-1">
+                <p
+                  className="text-[14px] font-semibold text-[#181818] mt-1 break-all whitespace-pre-wrap"
+                  style={{ wordBreak: "break-all", overflowWrap: "anywhere" }}
+                >
                   {timeStr}
                 </p>
               </div>
-              <div>
+              <div className="min-w-0">
                 <p className="text-[14px] font-medium text-[#737373]">Role</p>
-                <p className="text-[14px] font-semibold text-[#181818] mt-1">
+                <p
+                  className="text-[14px] font-semibold text-[#181818] mt-1 break-all whitespace-pre-wrap"
+                  style={{ wordBreak: "break-all", overflowWrap: "anywhere" }}
+                >
                   {shift.role || "-"}
                 </p>
               </div>
@@ -77,7 +86,10 @@ const UpcomingShiftModal = ({
               <p className="text-[14px] font-semibold text-[#181818] mb-2">
                 Event
               </p>
-              <p className="text-[14px] text-[#737373]">
+              <p
+                className="text-[14px] text-[#737373] break-all whitespace-pre-wrap"
+                style={{ wordBreak: "break-all", overflowWrap: "anywhere" }}
+              >
                 {name || "Not Assigned"}
               </p>
             </div>
@@ -89,7 +101,10 @@ const UpcomingShiftModal = ({
                 Any Instruction{" "}
                 <span className="text-sm text-[#9CA3AF]">(optional)</span>
               </p>
-              <p className="text-[14px] text-[#636363]">
+              <p
+                className="text-[14px] text-[#636363] break-all whitespace-pre-wrap"
+                style={{ wordBreak: "break-all", overflowWrap: "anywhere" }}
+              >
                 {shift.instructions || "No instructions provided."}
               </p>
             </div>
