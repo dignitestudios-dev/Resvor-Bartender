@@ -99,7 +99,7 @@ const Login = () => {
                 type={"email"}
                 id={"email"}
                 name={"email"}
-                maxLength={30}
+                maxLength={60}
                 value={values.email}
                 onChange={handleChange}
                 onBlur={handleBlur}
@@ -116,7 +116,7 @@ const Login = () => {
                 id={"password"}
                 name={"password"}
                 showToggle={true}
-                maxLength={250}
+                maxLength={60}
                 value={values.password}
                 onChange={handleChange}
                 onBlur={handleBlur}
