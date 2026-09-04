@@ -70,11 +70,19 @@ const Profile = () => {
               </p>
             </div>
           </div>
-          <div className="bg-[#EFEFEF] rounded-[12px] p-4">
-            <p className="text-[14px] font-[500] text-[#9E9E9E]">Address</p>
-            <p className="text-[16px] text-[#252525]">
-              {user?.address || "N/A"}
-            </p>
+          <div className="grid xl:grid-cols-2 sm:grid-cols-1 gap-2">
+            <div className="bg-[#EFEFEF] rounded-[12px] p-4">
+              <p className="text-[14px] font-[500] text-[#9E9E9E]">Job Title</p>
+              <p className="text-[16px] text-[#252525]">
+                {user?.jobTitle || "N/A"}
+              </p>
+            </div>
+            <div className="bg-[#EFEFEF] rounded-[12px] p-4">
+              <p className="text-[14px] font-[500] text-[#9E9E9E]">Address</p>
+              <p className="text-[16px] text-[#252525]">
+                {user?.address || "N/A"}
+              </p>
+            </div>
           </div>
         </div>
         <div></div>

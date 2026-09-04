@@ -5,6 +5,7 @@ import { ErrorToast } from "./components/ui/toaster";
 
 // Proxy configuration - similar to Vite setup
 // export const baseUrl = "https://api-dev.resvor.com";
+
 export const baseUrl = "https://api-staging.resvor.com";
 
 
