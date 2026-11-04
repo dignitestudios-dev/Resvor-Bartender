@@ -150,6 +150,8 @@ instance.interceptors.response.use(
             if (hasCookie) {
                 ErrorToast("Session expired. Please log in again.");
             }
+            window.location.replace("/auth/login");
+
         }
 
         return Promise.reject(error);

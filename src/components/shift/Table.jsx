@@ -9,7 +9,7 @@ import SuccessModal from "../global/SuccessModal";
 import { useGetMyShifts } from "@/lib/hooks/queries/useShifts";
 import utils from "@/lib/utils";
 
-const Table = ({ startDate, endDate }) => {
+const Table = ({ startDate, endDate, status = "" }) => {
   const [shiftModal, setShiftModal] = useState(false);
   const [timeOffOpen, setTimeOffOpen] = useState(false);
   const [shiftSwapOpen, setShiftSwapOpen] = useState(false);
@@ -36,7 +36,8 @@ const Table = ({ startDate, endDate }) => {
     limit: LIMIT,
     startDate: startDate || "",
     endDate: endDate || "",
-    status: activeTab === "all" ? "" : activeTab,
+    timing: activeTab === "all" ? "" : activeTab,
+    status: status || "",
   });
 
   const shifts = shiftsResponse?.data || [];
@@ -77,7 +78,27 @@ const Table = ({ startDate, endDate }) => {
       startDateTime: shift.startDateTime,
     };
   });
+  const getShiftStatus = (status) => {
+    const statusMap = {
+      draft: "Draft",
+      published: "Published",
+      cancelled: "Cancelled",
+      completed: "Completed",
+    };
 
+    return statusMap[status?.toLowerCase()] || status || "-";
+  };
+
+  const getShiftStatusColor = (status) => {
+    const colorMap = {
+      draft: "#6B7280",
+      published: "#0052CC",
+      cancelled: "#DC2626",
+      completed: "#28A745",
+    };
+
+    return colorMap[status?.toLowerCase()] || "#6B7280";
+  };
   return (
     <CustomPagination
       loading={isLoading}
@@ -132,8 +153,8 @@ const Table = ({ startDate, endDate }) => {
           <tbody>
             {normalizedShifts.length > 0 ? (
               normalizedShifts.map((shift, index) => {
-                const displayStatus = utils.getNormalizedStatus(shift.status);
-                const statusColor = utils.getStatusColorHex(shift.status);
+                const displayStatus = getShiftStatus(shift.status);
+                const statusColor = getShiftStatusColor(shift.status);
                 return (
                   <tr key={shift._id || index} className="border-b border-[#D4D4D4]">
                     <td className="px-4 py-5 truncate" title={shift.date}>
