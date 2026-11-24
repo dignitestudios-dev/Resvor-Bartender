@@ -14,6 +14,12 @@ export const navLinks = [
     selectedIcon: <Dashboard color="#010053" />,
   },
   {
+    name: "Bookings",
+    path: "/dashboard/bookings",
+    icon: <Bookings />,
+    selectedIcon: <Bookings color="#010053" />,
+  },
+  {
     name: "Shifts",
     path: "/dashboard/shift",
     icon: <Shift />,

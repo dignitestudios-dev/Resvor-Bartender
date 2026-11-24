@@ -90,6 +90,20 @@ export const getStatusColorHex = (status) => {
   }
 };
 
+export const formatNumber = (num) => {
+  if (num === null || num === undefined || isNaN(Number(num))) return "0";
+  return new Intl.NumberFormat("en-US").format(Number(num));
+};
+
+export const formatCurrency = (cents, currency = "USD") => {
+  if (cents === null || cents === undefined || isNaN(Number(cents))) return "$0.00";
+  const dollars = Number(cents) / 100;
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: currency?.toUpperCase() || "USD",
+  }).format(dollars);
+};
+
 const utils = {
   formatDateWithName,
   formatTime12,
@@ -97,6 +111,8 @@ const utils = {
   phoneToE164,
   getNormalizedStatus,
   getStatusColorHex,
+  formatNumber,
+  formatCurrency,
 };
 
 export default utils;
