@@ -3,8 +3,14 @@ import React, { useEffect, useMemo, useState } from "react";
 import { IoChevronBack, IoChevronForward } from "react-icons/io5";
 import PageLoader from "./PageLoader";
 
-const CustomPagination = ({ loading, totalPages, onPageChange, children }) => {
-  const [page, setPage] = useState(1);
+const CustomPagination = ({ loading, totalPages, onPageChange, currentPage, children }) => {
+  const [page, setPage] = useState(currentPage || 1);
+
+  useEffect(() => {
+    if (currentPage !== undefined && currentPage !== null) {
+      setPage(currentPage);
+    }
+  }, [currentPage]);
 
   const preventPrevious = useMemo(() => page === 1, [page, totalPages]);
   const preventNext = useMemo(() => page >= totalPages, [page, totalPages]);
